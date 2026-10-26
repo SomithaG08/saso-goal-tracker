@@ -1,0 +1,1260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Saso's Goal Tracker</title>
+<meta name="description" content="Daily to yearly goals, streaks, reflections and daily learning.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#F6F4FA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17161D" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Saso's Goal Tracker">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{-webkit-text-size-adjust:100%}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+img{max-width:100%}[hidden]{display:none!important}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one-column phone app; period tabs on top, content cards over an optional photo, fixed bottom nav. */
+:root{
+  --bg:#F6F4FA; --surface:rgba(255,255,255,.86); --surface-solid:#FFFFFF; --ink:#2B2838; --muted:#6E6A80; --line:#E6E2F0;
+  --accent:#6A5BD0; --accent-ink:#FFFFFF; --accent-soft:#ECE8FB;
+  --p-D:#CDEBDD; --p-W:#CFE1F6; --p-M:#F8DCCF; --p-Q:#F4E8B5; --p-Y:#E3DAF7;
+  --p-D-ink:#2F6B52; --p-W-ink:#2F5687; --p-M-ink:#8A4A31; --p-Q-ink:#7A6414; --p-Y-ink:#5A44A6;
+  --streak:#C9733A; --danger:#C2465A; --warn-bg:#FFF4D6; --warn-ink:#7A5A00;
+  --shadow:0 1px 2px rgba(43,40,56,.05),0 6px 20px rgba(43,40,56,.06);
+  --f-display:"Quicksand","Nunito Sans",system-ui,sans-serif;
+  --f-body:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"DM Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17161D; --surface:rgba(34,32,44,.86); --surface-solid:#22202C; --ink:#EEECF6; --muted:#A6A2B8; --line:#353244;
+  --accent:#B3A8F5; --accent-ink:#1B1830; --accent-soft:#2D2943;
+  --p-D:#264336; --p-W:#253A55; --p-M:#4A3127; --p-Q:#463D1C; --p-Y:#352C52;
+  --p-D-ink:#A9E3C8; --p-W-ink:#AFCDF3; --p-M-ink:#F4C2AC; --p-Q-ink:#EBD98C; --p-Y-ink:#CFC3F7;
+  --streak:#F0A46A; --danger:#F08597; --warn-bg:#3A3216; --warn-ink:#F2DC8F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17161D; --surface:rgba(34,32,44,.86); --surface-solid:#22202C; --ink:#EEECF6; --muted:#A6A2B8; --line:#353244;
+  --accent:#B3A8F5; --accent-ink:#1B1830; --accent-soft:#2D2943;
+  --p-D:#264336; --p-W:#253A55; --p-M:#4A3127; --p-Q:#463D1C; --p-Y:#352C52;
+  --p-D-ink:#A9E3C8; --p-W-ink:#AFCDF3; --p-M-ink:#F4C2AC; --p-Q-ink:#EBD98C; --p-Y-ink:#CFC3F7;
+  --streak:#F0A46A; --danger:#F08597; --warn-bg:#3A3216; --warn-ink:#F2DC8F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}
+
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#bg{position:fixed;inset:0;z-index:-1;background-size:cover;background-position:center}
+#bg::after{content:"";position:absolute;inset:0;background:var(--bg);opacity:.35}
+.app{max-width:560px;margin:0 auto;padding-block:14px 110px;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;font-weight:700}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.top h1{font-size:26px;line-height:1.15}
+.top .sub{color:var(--muted);font-size:13px;margin-top:2px}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:none;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.iconbtn svg{width:20px;height:20px}
+
+.card{background:var(--surface);border-radius:18px;padding:16px;box-shadow:var(--shadow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);min-width:0}
+.card h2{font-size:17px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;background:var(--surface);padding:5px;border-radius:16px;box-shadow:var(--shadow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.tab{border:0;background:transparent;border-radius:12px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;gap:1px;font-weight:700;font-size:13px}
+.tab small{font-family:var(--f-mono);font-size:11px;color:var(--muted);font-weight:400}
+.tab[aria-selected="true"]{background:var(--pc);color:var(--pi)}
+.tab[aria-selected="true"] small{color:var(--pi)}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.summary{display:flex;align-items:center;gap:16px}
+.ring{width:76px;height:76px;flex:none}
+.ring .trk{stroke:var(--line)} .ring .val{stroke:var(--pi);transition:stroke-dashoffset .4s}
+.ring text{fill:var(--ink);font-family:var(--f-mono);font-size:17px}
+.summary .big{font-family:var(--f-display);font-size:20px;font-weight:700}
+.summary .meta{color:var(--muted);font-size:13px}
+
+.banner{background:var(--warn-bg);color:var(--warn-ink);border-radius:14px;padding:10px 14px;font-size:14px;font-weight:600;display:flex;gap:10px;align-items:center}
+.banner svg{width:18px;height:18px;flex:none}
+
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.item{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.check{width:28px;height:28px;border-radius:9px;border:2px solid var(--line);background:var(--surface-solid);display:grid;place-items:center;flex:none;padding:0}
+.check svg{width:16px;height:16px;opacity:0}
+.check[aria-checked="true"]{background:var(--pc,var(--accent));border-color:var(--pc,var(--accent));color:var(--pi,var(--accent-ink))}
+.check[aria-checked="true"] svg{opacity:1}
+.item .body{flex:1;min-width:0}
+.item .t{font-weight:600;overflow-wrap:anywhere}
+.item.done .t{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted)}
+.item .tags{display:flex;gap:8px;align-items:center;margin-top:2px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.cat{border-radius:6px;padding:1px 7px;background:var(--accent-soft);font-weight:600;font-size:11.5px;letter-spacing:.02em}
+.streak{color:var(--streak);font-family:var(--f-mono);font-size:12px;display:inline-flex;gap:3px;align-items:center}
+.streak svg{width:12px;height:12px}
+.more{border:0;background:transparent;color:var(--muted);width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none}
+.more svg{width:18px;height:18px}
+
+.add{border:1.5px dashed var(--line);background:transparent;border-radius:14px;padding:11px;width:100%;font-weight:700;color:var(--muted);margin-top:10px}
+.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:700;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn.danger.armed{background:var(--danger);color:#fff}
+.empty{color:var(--muted);text-align:center;padding:14px 4px;font-size:14px}
+
+textarea,input,select{font:inherit;color:var(--ink);background:var(--surface-solid);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%;box-sizing:border-box}
+textarea{resize:vertical;min-height:84px}
+.note-foot{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:6px}
+
+/* goals */
+.goal{border-top:1px solid var(--line);padding:12px 0}
+.goal:first-child{border-top:0;padding-top:0}
+.goal-head{display:flex;gap:10px;align-items:flex-start}
+.goal-head .body{flex:1;min-width:0}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.ms{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ms li{display:flex;gap:10px;align-items:center;font-size:14px}
+.ms .check{width:22px;height:22px;border-radius:7px}
+.ms .check svg{width:13px;height:13px}
+.ms li.done span{color:var(--muted);text-decoration:line-through}
+
+/* lists */
+.li-add{display:flex;gap:8px;margin-top:10px}
+.li-add input{flex:1;min-width:0}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.row-actions .btn{padding:8px 12px;font-size:13px}
+
+/* stats */
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kpi{background:var(--surface);border-radius:16px;padding:12px;box-shadow:var(--shadow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);min-width:0}
+.kpi b{display:block;font-family:var(--f-mono);font-size:22px;font-weight:500}
+.kpi span{font-size:12px;color:var(--muted)}
+.chart{width:100%;height:auto;display:block}
+.chart .grid{stroke:var(--line)}
+.chart .lbl{fill:var(--muted);font-family:var(--f-mono);font-size:9.5px}
+.chart .line{stroke:var(--accent);fill:none;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.chart .area{fill:var(--accent);opacity:.14}
+.chart .dot{fill:var(--accent);stroke:var(--surface-solid);stroke-width:2}
+.chart .barr{fill:var(--accent);opacity:.75}
+.chart .barr.cur{opacity:1}
+.prow{display:grid;grid-template-columns:84px 1fr 44px;gap:10px;align-items:center;font-size:14px;padding:5px 0}
+.prow .bar{margin:0;height:10px}
+.prow .bar i{background:var(--pi)}
+.prow .mono{text-align:right;font-size:13px}
+
+/* nav */
+nav.bottom{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+nav.bottom .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav.bottom button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:11.5px;font-weight:700;color:var(--muted)}
+nav.bottom button svg{width:22px;height:22px}
+nav.bottom button[aria-current="page"]{color:var(--accent)}
+
+/* sheet */
+.overlay{position:fixed;inset:0;z-index:40;background:rgba(20,18,30,.38);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface-solid);width:100%;max-width:560px;border-radius:22px 22px 0 0;box-sizing:border-box;max-height:88vh;overflow:auto;
+  padding:18px max(18px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+.sheet h3{font-size:19px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field>label,.field>.lab{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line);background:transparent;border-radius:10px;padding:7px 11px;font-weight:600;font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.sheet-actions{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.sheet-actions .r{display:flex;gap:8px;margin-left:auto}
+.bgprev{height:120px;border-radius:14px;background:var(--accent-soft) center/cover no-repeat;border:1px solid var(--line)}
+.hint{font-size:13px;color:var(--muted)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:12px;font-weight:600;font-size:14px;max-width:calc(100% - 32px)}
+/* learn */
+.quote{margin:0;font-family:var(--f-display);font-size:18px;font-weight:600;line-height:1.4;text-wrap:pretty}
+.quote.sm{font-size:15px}
+.by{color:var(--muted);font-size:13px;margin-top:6px}
+.stepper{display:flex;align-items:center;gap:4px}
+.stepper button{border:1px solid var(--line);background:var(--surface-solid);width:30px;height:30px;border-radius:9px;display:grid;place-items:center;padding:0;font-size:16px;line-height:1}
+.stepper span{font-size:12px;color:var(--muted);min-width:56px;text-align:center;font-family:var(--f-mono)}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.word{font-family:var(--f-display);font-size:28px;font-weight:700;line-height:1.15;overflow-wrap:anywhere}
+.wtype{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-left:6px;font-weight:400}
+.wrow{display:flex;gap:10px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.wrow .lang{font-family:var(--f-mono);font-size:11px;font-weight:500;border-radius:6px;padding:2px 6px;background:var(--accent-soft);flex:none;min-width:22px;text-align:center}
+.wrow .lang.it{background:var(--p-D);color:var(--p-D-ink)}
+.wrow .lang.en{background:var(--p-W);color:var(--p-W-ink)}
+.wrow .lang.fr{background:var(--p-Y);color:var(--p-Y-ink)}
+.ex{font-style:italic;color:var(--ink)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.tools .chip{display:inline-flex;gap:6px;align-items:center}
+.tools .chip svg{width:15px;height:15px}
+.lesson h3{font-size:19px;margin:6px 0 6px}
+.lesson p{margin:0 0 10px;max-width:65ch}
+pre.code{margin:0 0 12px;background:var(--accent-soft);border-radius:12px;padding:12px;overflow-x:auto;font-family:var(--f-mono);font-size:12.5px;line-height:1.55;white-space:pre}
+.quiz{border:1px dashed var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.quiz .q{font-weight:700}
+.quiz .a{background:var(--p-D);color:var(--p-D-ink);border-radius:10px;padding:8px 10px;font-weight:600}
+.learned-pill{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.refl{border-top:1px solid var(--line);padding:10px 0}
+.refl:first-child{border-top:0;padding-top:0}
+.refl .d{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
+.refl .txt{white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:3px;overflow-wrap:anywhere}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div id="bg"></div>
+<div class="app" id="app"><div class="card"><div class="empty">Loading your goals…</div></div></div>
+<nav class="bottom" aria-label="Sections"><div class="in" id="nav"></div></nav>
+<div id="sheetRoot"></div>
+<div class="toast" id="toast" hidden></div>
+<input type="file" id="bgFile" accept="image/*" hidden>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+
+<script>
+(function(){
+const P={D:"Daily",W:"Weekly",M:"Monthly",Q:"Quarterly",Y:"Yearly"};
+const PU={D:"Today",W:"This week",M:"This month",Q:"This quarter",Y:"This year"};
+const SU={D:"d",W:"w",M:"mo",Q:"q",Y:"y"};
+const CATS={career:"Career",productivity:"Productivity",personal:"Personal"};
+const LS="goal-tracker-v1";
+const STANDALONE=!window.claude;
+const ic={
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  dots:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',
+  flame:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 4 5 5.5 5 10.5A5 5 0 0 1 7 12.5c0-2 1-3.5 2-4.5.3 2 1.3 3 2.3 3C11 8 11 5 12 2z"/></svg>',
+  img:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
+  tracker:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>',
+  goals:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg>',
+  lists:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 1.5-2M4 12l1 1 1.5-2M4 18l1 1 1.5-2"/></svg>',
+  stats:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M5 15l4-5 4 3 6-7"/></svg>',
+  backup:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>',
+  learn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-1.5-5-2-8-1.5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-13c-3-.5-6 0-8 1.5z"/><path d="M12 6v13"/></svg>',
+  speak:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 0 1 0 6"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 16.9l-5.3 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>',
+  starOn:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 16.9l-5.3 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>'
+};
+
+// ---------- daily content ----------
+const QUOTES=[
+["We are what we repeatedly do. Excellence, then, is not an act, but a habit.","Will Durant"],
+["You do not rise to the level of your goals. You fall to the level of your systems.","James Clear"],
+["Every action you take is a vote for the type of person you wish to become.","James Clear"],
+["Motivation is what gets you started. Habit is what keeps you going.","Jim Ryun"],
+["Le hasard ne favorise que les esprits préparés.","Louis Pasteur"],
+["Ce n'est pas parce que les choses sont difficiles que nous n'osons pas, c'est parce que nous n'osons pas qu'elles sont difficiles.","Sénèque"],
+["Rien ne sert de courir ; il faut partir à point.","Jean de La Fontaine"],
+["Patience et longueur de temps font plus que force ni que rage.","Jean de La Fontaine"],
+["Hâtez-vous lentement, et sans perdre courage, vingt fois sur le métier remettez votre ouvrage.","Nicolas Boileau"],
+["Ce que l'on conçoit bien s'énonce clairement.","Nicolas Boileau"],
+["The best way to predict the future is to invent it.","Alan Kay"],
+["Stay hungry. Stay foolish.","Steve Jobs"],
+["The only way to do great work is to love what you do.","Steve Jobs"],
+["Nothing in life is to be feared, it is only to be understood.","Marie Curie"],
+["One never notices what has been done; one can only see what remains to be done.","Marie Curie"],
+["Life is like riding a bicycle. To keep your balance you must keep moving.","Albert Einstein"],
+["A journey of a thousand miles begins with a single step.","Laozi"],
+["Discipline is the bridge between goals and accomplishment.","Jim Rohn"],
+["You don't have to be great to start, but you have to start to be great.","Zig Ziglar"],
+["Success is the sum of small efforts, repeated day in and day out.","Robert Collier"],
+["What I cannot create, I do not understand.","Richard Feynman"],
+["The first principle is that you must not fool yourself, and you are the easiest person to fool.","Richard Feynman"],
+["Talk is cheap. Show me the code.","Linus Torvalds"],
+["Programs must be written for people to read, and only incidentally for machines to execute.","Abelson & Sussman"],
+["All models are wrong, but some are useful.","George Box"],
+["Simplicity is prerequisite for reliability.","Edsger W. Dijkstra"],
+["Well done is better than well said.","Benjamin Franklin"],
+["Lost time is never found again.","Benjamin Franklin"],
+["Le travail éloigne de nous trois grands maux : l'ennui, le vice et le besoin.","Voltaire"],
+["Il faut cultiver notre jardin.","Voltaire"],
+["La perfection est atteinte non quand il n'y a plus rien à ajouter, mais quand il n'y a plus rien à retrancher.","Antoine de Saint-Exupéry"],
+["Rien ne se perd, rien ne se crée, tout se transforme.","Antoine Lavoisier"],
+["Ever tried. Ever failed. No matter. Try again. Fail again. Fail better.","Samuel Beckett"],
+["Do what you can, with what you have, where you are.","Theodore Roosevelt"],
+["The most effective way to do it, is to do it.","Amelia Earhart"],
+["Small daily improvements over time lead to stunning results.","Robin Sharma"],
+["Hard work beats talent when talent doesn't work hard.","Tim Notke"],
+["Genius is one percent inspiration, ninety-nine percent perspiration.","Thomas Edison"]
+];
+// [French, type, English, Italian, example, topic]
+const WORDS=[
+["un enjeu","n.m.","a stake, what is at stake","la posta in gioco","L'enjeu de cette négociation est considérable.","Travail"],
+["s'épanouir","v.","to flourish, to thrive","realizzarsi","Elle s'épanouit vraiment dans son nouveau poste.","Émotions"],
+["un défi","n.m.","a challenge","una sfida","Apprendre deux langues en même temps est un vrai défi.","Général"],
+["la croissance","n.f.","growth","la crescita","La croissance économique a ralenti cette année.","Économie"],
+["le chômage","n.m.","unemployment","la disoccupazione","Le taux de chômage des jeunes reste élevé.","Économie"],
+["un licenciement","n.m.","a dismissal, a layoff","un licenziamento","L'entreprise a annoncé une vague de licenciements.","Travail"],
+["une démarche","n.f.","a procedure, an approach","una procedura","Les démarches administratives prennent beaucoup de temps.","Société"],
+["davantage","adv.","more","di più","Il faudrait investir davantage dans la formation.","Connecteurs"],
+["néanmoins","adv.","nevertheless","tuttavia","Le projet est risqué ; néanmoins, il mérite d'être tenté.","Connecteurs"],
+["en revanche","loc.","on the other hand","invece","Le loyer est cher ; en revanche, le quartier est calme.","Connecteurs"],
+["le réchauffement climatique","n.m.","global warming","il riscaldamento globale","Le réchauffement climatique menace de nombreuses espèces.","Environnement"],
+["une empreinte carbone","n.f.","a carbon footprint","un'impronta di carbonio","Prendre le train réduit votre empreinte carbone.","Environnement"],
+["le gaspillage","n.m.","waste, wastefulness","lo spreco","Le gaspillage alimentaire est un problème majeur.","Environnement"],
+["durable","adj.","sustainable, lasting","sostenibile","Nous cherchons une solution durable.","Environnement"],
+["une inondation","n.f.","a flood","un'inondazione","Les inondations ont détruit plusieurs villages.","Environnement"],
+["la sécheresse","n.f.","drought","la siccità","La sécheresse a touché les récoltes cet été.","Environnement"],
+["les déchets","n.m.pl.","waste, rubbish","i rifiuti","Il faut trier ses déchets avant de les jeter.","Environnement"],
+["une énergie renouvelable","n.f.","renewable energy","un'energia rinnovabile","L'éolien est une énergie renouvelable.","Environnement"],
+["un débat","n.m.","a debate","un dibattito","Le débat sur l'IA divise les experts.","Société"],
+["une grève","n.f.","a strike","uno sciopero","La grève des transports a paralysé Paris.","Société"],
+["la citoyenneté","n.f.","citizenship","la cittadinanza","L'école enseigne aussi la citoyenneté.","Société"],
+["un témoignage","n.m.","a testimony, an account","una testimonianza","Son témoignage a ému tout le public.","Médias"],
+["une enquête","n.f.","an investigation, a survey","un'indagine","Le journal a publié une enquête sur la pollution.","Médias"],
+["un sondage","n.m.","a poll","un sondaggio","Selon un sondage récent, 60 % des Français sont d'accord.","Médias"],
+["les actualités","n.f.pl.","the news","le notizie","Je regarde les actualités tous les soirs.","Médias"],
+["une fausse information","n.f.","fake news","una notizia falsa","Il faut vérifier la source pour repérer une fausse information.","Médias"],
+["la liberté d'expression","n.f.","freedom of speech","la libertà di espressione","La liberté d'expression est un droit fondamental.","Société"],
+["la santé mentale","n.f.","mental health","la salute mentale","Les entreprises prennent davantage en compte la santé mentale.","Santé"],
+["une ordonnance","n.f.","a prescription","una ricetta medica","Le médecin m'a fait une ordonnance.","Santé"],
+["guérir","v.","to heal, to cure","guarire","Il a fallu trois semaines pour guérir.","Santé"],
+["le sommeil","n.m.","sleep","il sonno","Le manque de sommeil nuit à la concentration.","Santé"],
+["se détendre","v.","to relax","rilassarsi","Le week-end, j'aime me détendre au parc.","Santé"],
+["l'épuisement professionnel","n.m.","burnout","l'esaurimento da lavoro (burnout)","L'épuisement professionnel touche de nombreux cadres.","Santé"],
+["une alimentation équilibrée","n.f.","a balanced diet","un'alimentazione equilibrata","Une alimentation équilibrée aide à rester en forme.","Santé"],
+["un logiciel","n.m.","software","un software","Ce logiciel analyse les données en temps réel.","Tech"],
+["les données","n.f.pl.","data","i dati","Nous devons nettoyer les données avant l'analyse.","Tech"],
+["un réseau","n.m.","a network","una rete","Le réseau est saturé aux heures de pointe.","Tech"],
+["une mise à jour","n.f.","an update","un aggiornamento","Installez la mise à jour pour corriger le bug.","Tech"],
+["télécharger","v.","to download","scaricare","J'ai téléchargé le jeu de données hier soir.","Tech"],
+["un mot de passe","n.m.","a password","una password","Choisissez un mot de passe long et unique.","Tech"],
+["la vie privée","n.f.","privacy","la riservatezza","Le RGPD protège la vie privée des utilisateurs.","Tech"],
+["un écran","n.m.","a screen","uno schermo","Je passe trop de temps devant les écrans.","Tech"],
+["l'intelligence artificielle","n.f.","artificial intelligence","l'intelligenza artificiale","L'intelligence artificielle transforme le marché du travail.","Tech"],
+["un outil","n.m.","a tool","uno strumento","Python est un outil indispensable en data science.","Tech"],
+["une découverte","n.f.","a discovery","una scoperta","Cette découverte a changé la médecine.","Sciences"],
+["un chercheur, une chercheuse","n.","a researcher","un ricercatore, una ricercatrice","Une chercheuse a présenté ses résultats au congrès.","Sciences"],
+["un abonnement","n.m.","a subscription","un abbonamento","J'ai résilié mon abonnement à la salle de sport.","Vie quotidienne"],
+["une facture","n.f.","a bill, an invoice","una bolletta","La facture d'électricité a encore augmenté.","Vie quotidienne"],
+["un loyer","n.m.","rent","un affitto","Le loyer représente la moitié de mon budget.","Logement"],
+["un propriétaire","n.m.","an owner, a landlord","un proprietario","Le propriétaire doit réparer le chauffage.","Logement"],
+["emménager","v.","to move in","trasferirsi","Nous avons emménagé dans le 11e arrondissement.","Logement"],
+["un quartier","n.m.","a neighbourhood","un quartiere","C'est un quartier animé, plein de cafés.","Logement"],
+["les transports en commun","n.m.pl.","public transport","i mezzi pubblici","À Paris, je me déplace en transports en commun.","Ville"],
+["un embouteillage","n.m.","a traffic jam","un ingorgo","Il y avait un embouteillage sur le périphérique.","Ville"],
+["un retard","n.m.","a delay","un ritardo","Le train a quarante minutes de retard.","Ville"],
+["un aller-retour","n.m.","a return ticket","un biglietto di andata e ritorno","J'ai pris un aller-retour Paris–Lyon.","Voyage"],
+["un séjour","n.m.","a stay","un soggiorno","Notre séjour en Bretagne était parfait.","Voyage"],
+["une randonnée","n.f.","a hike","un'escursione","Nous avons fait une randonnée dans les Alpes.","Voyage"],
+["un entretien d'embauche","n.m.","a job interview","un colloquio di lavoro","J'ai un entretien d'embauche jeudi matin.","Travail"],
+["un stage","n.m.","an internship","un tirocinio","Mon stage de six mois commence en mars.","Travail"],
+["les compétences","n.f.pl.","skills","le competenze","Mettez en avant vos compétences en SQL.","Travail"],
+["une augmentation","n.f.","a raise, an increase","un aumento","Elle a demandé une augmentation à son manager.","Travail"],
+["un poste","n.m.","a position, a job","una posizione","Ce poste exige trois ans d'expérience.","Travail"],
+["une réunion","n.f.","a meeting","una riunione","La réunion a été reportée à demain.","Travail"],
+["une échéance","n.f.","a deadline","una scadenza","L'échéance du projet approche.","Travail"],
+["un bilan","n.m.","an assessment, a review","un bilancio","Faisons le bilan de ce trimestre.","Travail"],
+["une tâche","n.f.","a task","un compito","J'ai trop de tâches à accomplir aujourd'hui.","Travail"],
+["gérer","v.","to manage","gestire","Il sait bien gérer son temps.","Travail"],
+["mettre en œuvre","loc.v.","to implement","mettere in atto","Nous allons mettre en œuvre la nouvelle stratégie.","Travail"],
+["un atout","n.m.","an asset, a strength","un punto di forza","Parler trois langues est un véritable atout.","Travail"],
+["la concurrence","n.f.","competition","la concorrenza","La concurrence est forte dans ce secteur.","Économie"],
+["un fournisseur","n.m.","a supplier","un fornitore","Nous avons changé de fournisseur.","Économie"],
+["le chiffre d'affaires","n.m.","turnover, revenue","il fatturato","Le chiffre d'affaires a augmenté de 12 %.","Économie"],
+["un bénéfice","n.m.","a profit","un profitto","L'entreprise a réalisé un bénéfice record.","Économie"],
+["une dette","n.f.","a debt","un debito","La dette publique inquiète les économistes.","Économie"],
+["l'épargne","n.f.","savings","il risparmio","Une partie de mon salaire va à l'épargne.","Économie"],
+["un emprunt","n.m.","a loan","un prestito","Ils ont fait un emprunt pour acheter l'appartement.","Économie"],
+["la consommation","n.f.","consumption","il consumo","La consommation d'énergie baisse en été.","Économie"],
+["un avis","n.m.","an opinion","un parere","À mon avis, cette solution est la meilleure.","Opinion"],
+["convaincre","v.","to convince","convincere","Ses arguments ont convaincu le jury.","Opinion"],
+["soutenir","v.","to support","sostenere","Je soutiens totalement cette initiative.","Opinion"],
+["remettre en question","loc.v.","to question, to challenge","mettere in discussione","Cette étude remet en question nos hypothèses.","Opinion"],
+["s'engager","v.","to commit, to get involved","impegnarsi","Elle s'engage dans une association locale.","Société"],
+["un malentendu","n.m.","a misunderstanding","un malinteso","C'était juste un malentendu entre nous.","Émotions"],
+["la confiance","n.f.","trust, confidence","la fiducia","La confiance se construit avec le temps.","Émotions"],
+["fier, fière","adj.","proud","orgoglioso, orgogliosa","Je suis fière de mes progrès.","Émotions"],
+["la honte","n.f.","shame","la vergogna","Il n'y a aucune honte à demander de l'aide.","Émotions"],
+["ému, émue","adj.","moved, touched","commosso, commossa","Elle était très émue pendant la cérémonie.","Émotions"],
+["inquiet, inquiète","adj.","worried","preoccupato, preoccupata","Ne sois pas inquiète, tout va bien se passer.","Émotions"],
+["soulagé, soulagée","adj.","relieved","sollevato, sollevata","J'étais soulagé après l'examen.","Émotions"],
+["une habitude","n.f.","a habit","un'abitudine","Lire chaque matin est devenu une habitude.","Vie quotidienne"],
+["le bénévolat","n.m.","volunteering","il volontariato","Le bénévolat m'a appris beaucoup de choses.","Société"],
+["un préjugé","n.m.","a prejudice","un pregiudizio","Il faut lutter contre les préjugés.","Société"],
+["l'égalité des chances","n.f.","equal opportunities","le pari opportunità","L'école doit garantir l'égalité des chances.","Société"],
+["une bourse","n.f.","a scholarship","una borsa di studio","Il a obtenu une bourse pour étudier à l'étranger.","Éducation"],
+["réussir un examen","loc.v.","to pass an exam","superare un esame","Elle a réussi son examen du premier coup.","Éducation"],
+["un échec","n.m.","a failure","un fallimento","Un échec est aussi une occasion d'apprendre.","Éducation"],
+["la réussite","n.f.","success","il successo","La réussite demande de la régularité.","Éducation"],
+["le patrimoine","n.m.","heritage","il patrimonio","Notre-Dame fait partie du patrimoine mondial.","Culture"],
+["une œuvre","n.f.","a work (of art)","un'opera","Cette œuvre est exposée au Louvre.","Culture"],
+["un roman","n.m.","a novel","un romanzo","Je lis un roman de Simenon.","Culture"],
+["améliorer","v.","to improve","migliorare","Je veux améliorer mon français professionnel.","Général"],
+["aboutir à","v.","to lead to, to result in","portare a","Les discussions ont abouti à un accord.","Général"],
+["éviter","v.","to avoid","evitare","Évitez de travailler tard le soir.","Général"],
+["prévoir","v.","to plan, to foresee","prevedere","Nous prévoyons de lancer le produit en juin.","Général"],
+["se rendre compte","v.","to realise","rendersi conto","Je me suis rendu compte de mon erreur.","Général"],
+["avoir du mal à","loc.v.","to struggle to","fare fatica a","J'ai du mal à me lever tôt.","Général"],
+["tenir compte de","loc.v.","to take into account","tenere conto di","Il faut tenir compte des retours des clients.","Général"],
+["en fin de compte","loc.","ultimately, in the end","in fin dei conti","En fin de compte, nous avons choisi Lyon.","Connecteurs"],
+["d'ailleurs","adv.","besides, by the way","del resto","D'ailleurs, il avait raison depuis le début.","Connecteurs"],
+["pourtant","adv.","yet, however","eppure","Il est fatigué, pourtant il continue.","Connecteurs"],
+["auparavant","adv.","previously, before","in precedenza","Auparavant, je travaillais à Marseille.","Connecteurs"],
+["désormais","adv.","from now on","d'ora in poi","Désormais, les réunions auront lieu en ligne.","Connecteurs"],
+["au fur et à mesure","loc.","gradually, as you go","man mano","On apprend au fur et à mesure.","Connecteurs"],
+["quant à","prép.","as for","quanto a","Quant à moi, je préfère le télétravail.","Connecteurs"]
+];
+const LESSONS=[
+{t:"F1 Strategy",h:"The four phases that decide a race",b:"A result is built in four places, each with its own data: qualifying (single-lap pace; a few tenths decide the grid), race pace (long-run speed with fuel, tyres and traffic), pit strategy (when to stop and on which tyre) and reliability (the chance of a DNF). Team data scientists work on all four at once.",c:`qualifying   -> grid position     (one-lap pace)
+race pace    -> stint lap times   (fuel, tyres, traffic)
+pit strategy -> stop laps, tyres  (undercut / overcut)
+reliability  -> finish or DNF     (failure probability)`,q:"Which phase is mostly about one-lap pace?",a:"Qualifying."},
+{t:"Python",h:"Lists and indexing with lap times",b:"A list keeps items in order and counts positions from 0. Negative indexes count from the end, so -1 is always the last item. Slices take a range: start is included, end is not.",c:`laps = [81.2, 80.9, 82.1, 80.4, 81.8]
+laps[0]     # 81.2  first lap
+laps[-1]    # 81.8  last lap
+laps[:3]    # [81.2, 80.9, 82.1]
+min(laps)   # 80.4`,q:"What is laps[-2]?",a:"80.4, the second-to-last item."},
+{t:"Python",h:"Dictionaries: instant lookups",b:"A list has to be checked item by item. A dict jumps straight to the value from its key using a hash, so lookups stay fast no matter how big it gets.",c:`teams = {"VER": "Red Bull", "LEC": "Ferrari", "NOR": "McLaren"}
+teams["LEC"]              # 'Ferrari'
+teams["HAM"] = "Ferrari"  # add
+for d, t in teams.items():
+    print(f"{d} races for {t}")`,q:"Why is teams[\"LEC\"] faster than searching a list of pairs?",a:"The dict hashes the key and goes straight to its slot instead of scanning every item."},
+{t:"Python",h:"Functions: write once, call anywhere",b:"A function packages logic under a name. Parameters are the inputs, return sends the result back. Without return, a function gives back None.",c:`def fastest_lap(laps):
+    return min(laps)
+
+def avg_lap(laps):
+    return sum(laps) / len(laps)
+
+avg_lap([81.2, 80.9, 82.1, 80.4, 81.8])   # 81.28`,q:"What does a function return if you forget the return line?",a:"None."},
+{t:"Python",h:"try / except: plan for failure",b:"Real inputs break: text instead of numbers, a zero denominator, a missing file, a timed-out API. Catch specific errors and handle each one with a clear message.",c:`try:
+    laps = int(input("Laps: "))
+    pace = 5400 / laps
+except ValueError:
+    print("Type a whole number.")
+except ZeroDivisionError:
+    print("Laps can't be 0.")`,q:"Which exception does int(\"abc\") raise?",a:"ValueError."},
+{t:"Python",h:"Classes: one structure, many objects",b:"A class defines the attributes and behaviour that every object of that kind shares. Each instance holds its own values.",c:`class Driver:
+    def __init__(self, name, team, wins):
+        self.name, self.team, self.wins = name, team, wins
+    def summary(self):
+        return f"{self.name} drives for {self.team} with {self.wins} wins."
+
+Driver("Leclerc", "Ferrari", 8).summary()`,q:"What is the difference between Driver and Driver(\"Leclerc\", ...)?",a:"Driver is the class (the definition); the call creates one instance with its own values."},
+{t:"F1 Data",h:"FastF1: load a real race",b:"FastF1 pulls official F1 timing into pandas: every lap, sector, tyre compound, tyre age, stint and weather, plus car telemetry. Enable the cache so each session downloads only once.",c:`import fastf1
+fastf1.Cache.enable_cache("cache")      # folder must exist
+s = fastf1.get_session(2024, "Bahrain", "R")
+s.load()
+laps = s.laps
+laps[["Driver", "LapNumber", "LapTime", "Compound", "TyreLife", "Stint"]]
+laps.pick_fastest()[["Driver", "LapTime", "Compound"]]`,q:"Which column tells you how old the tyre is on each lap?",a:"TyreLife."},
+{t:"NumPy",h:"Why NumPy beats Python loops",b:"A NumPy array stores one data type in one continuous block of memory, so an operation runs over the whole array in compiled code instead of checking each element's type in a Python loop.",c:`import numpy as np
+laps = np.array([81.2, 80.9, 82.1, 80.4, 81.8])
+laps.mean()          # 81.28
+laps[laps < 81.5]    # array([81.2, 80.9, 80.4])`,q:"What does laps[laps < 81.5] do?",a:"Builds a True/False mask and keeps only the laps under 81.5 s."},
+{t:"NumPy",h:"Broadcasting and standardising",b:"Broadcasting applies an operation between an array and a scalar (or smaller array) without a loop. Standardising (subtract the mean, divide by the std) uses it and appears in most ML pipelines.",c:`z = (laps - laps.mean()) / laps.std()
+np.argmin(laps)      # 3 -> index of the fastest lap`,q:"What does np.argmin return: the value or the position?",a:"The position (index) of the minimum."},
+{t:"Pandas",h:"The first 5 minutes with any dataset",b:"Always run the same inspection before analysing: shape, types, missing values and summary stats. It catches wrong types and gaps before they break a model.",c:`df = pd.read_csv("results.csv")
+df.head(10); df.shape; df.dtypes
+df.info()
+df.isnull().sum()
+df.describe()`,q:"Which command counts missing values per column?",a:"df.isnull().sum()"},
+{t:"Pandas",h:"Filtering rows with conditions",b:"Combine conditions with & (and) and | (or), never with Python's and/or, and wrap each condition in parentheses.",c:`ver_hard = laps[(laps["Driver"] == "VER") &
+                (laps["Compound"] == "HARD")]
+early = laps[(laps["LapNumber"] <= 5) | (laps["Stint"] == 1)]`,q:"Why are the parentheses needed?",a:"& binds more tightly than ==, so without them pandas evaluates the wrong expression and raises an error."},
+{t:"Pandas",h:"Stint pace with groupby",b:"groupby splits the laps into groups, aggregates each one, and combines the results. Convert LapTime (a timedelta) to seconds first.",c:`laps["LapS"] = laps["LapTime"].dt.total_seconds()
+laps.groupby(["Driver", "Stint"])["LapS"].agg(["mean", "std", "count"])`,q:"What does the std column tell a strategist?",a:"How consistent each driver was in that stint (lower = more consistent)."},
+{t:"Pandas",h:"merge vs concat",b:"concat stacks tables (more rows, e.g. several races). merge joins tables on a key, like SQL JOIN. Check the row count after merging to catch duplicates.",c:`all_races = pd.concat([bahrain, jeddah, melbourne])
+full = results.merge(drivers, on="driver_id", how="left")`,q:"Which one do you use to add each driver's team to a results table?",a:"merge, on the shared driver_id key."},
+{t:"F1 Strategy",h:"How tyres shape strategy",b:"Pirelli brings three compounds each weekend: Soft (fastest, shortest life), Medium and Hard. Degradation is thermal (the tyre overheats and loses grip) or mechanical (the rubber wears away). The cliff is the point where lap time suddenly drops off; graining is rubber tearing and rolling on the surface.",c:`Soft   : quick, short stint, early cliff
+Medium : balanced
+Hard   : slower, long stint, slow degradation`,q:"What is the difference between thermal and mechanical degradation?",a:"Thermal: the tyre runs too hot and loses grip (can recover). Mechanical: the tread physically wears away."},
+{t:"Data Cleaning",h:"Keep only representative laps",b:"In-laps, out-laps, safety car laps and lap 1 are slow for reasons unrelated to tyre pace. Remove them before modelling degradation.",c:`clean = (laps.pick_wo_box()          # drop in/out laps
+            .pick_quicklaps(1.07))   # within 107% of fastest
+clean = clean[clean["TrackStatus"] == "1"]   # green flag only`,q:"Why remove safety car laps from a degradation model?",a:"They are slow because of the safety car, not tyre wear, so they would distort the slope."},
+{t:"Data Cleaning",h:"Missing values: drop or fill?",b:"First ask why data is missing. Missing completely at random can usually be dropped. If missingness depends on something (no lap time because the car retired), dropping or filling with the mean can bias the result.",c:`df["Age"].isnull().mean()            # share missing
+df["Age"].fillna(df.groupby("Pclass")["Age"].transform("median"))`,q:"Why fill with the median per group instead of the overall median?",a:"It keeps differences between groups, giving a more realistic estimate."},
+{t:"Data Cleaning",h:"Outliers: error or signal?",b:"Z-score flags values beyond ±3 std; the IQR rule flags values beyond 1.5 × IQR from the quartiles. Domain knowledge decides what to do: a puncture lap is noise for a pace model but signal for a reliability study.",c:`q1, q3 = np.percentile(lap_s, [25, 75])
+iqr = q3 - q1
+mask = (lap_s < q1 - 1.5*iqr) | (lap_s > q3 + 1.5*iqr)`,q:"Why is IQR more robust than the z-score?",a:"The mean and std used by z-scores are themselves pulled by outliers; quartiles are not."},
+{t:"Statistics",h:"When the mean lies",b:"One extreme value drags the mean. The median stays with the typical value.",c:`laps = [81.0, 81.2, 80.9, 81.4, 81.1, 140.0]   # puncture
+np.mean(laps)    # 90.93
+np.median(laps)  # 81.15`,q:"Which describes the driver's normal pace?",a:"The median (81.15 s)."},
+{t:"Statistics",h:"Standard deviation = consistency",b:"Std is roughly the average distance from the mean. Two drivers with the same average can be completely different racers.",c:`a = [80, 81, 80, 82, 80]   # mean 80.6, std ≈ 0.8
+b = [70, 80, 90, 80, 80]   # mean 80.0, std ≈ 6.3`,q:"Which driver would a team trust on a long stint?",a:"Driver A, with the much lower standard deviation."},
+{t:"Probability",h:"Conditional probability and Bayes",b:"P(A | B) is the chance of A once you know B happened. Bayes' rule updates a belief with new evidence: P(A|B) = P(B|A) × P(A) / P(B).",c:`# illustrative numbers
+P(SC)              = 0.30
+P(debris | SC)     = 0.80
+P(debris)          = 0.35
+P(SC | debris)     = 0.80 * 0.30 / 0.35 ≈ 0.69`,q:"Seeing debris on track, does the SC chance go up or down here?",a:"Up, from 30% to about 69%."},
+{t:"Probability",h:"Expected value of a pit call",b:"Weight each outcome by its probability and add them up. Choose the option with the best expected value, then check how bad the worst case is.",c:`# pit now: +5 s if SC follows (p = 0.3), -2 s otherwise
+EV = 0.3 * 5 + 0.7 * (-2)    # = +0.1 s`,q:"Is pitting now a good bet in this example?",a:"Slightly: +0.1 s expected, but it loses 2 s 70% of the time, so risk appetite matters."},
+{t:"Probability",h:"Distributions strategists use",b:"Normal: lap-time noise around a mean. Poisson: number of safety cars in a race. Exponential: time until the next safety car.",c:`from scipy.stats import poisson
+poisson.pmf(0, mu=0.8)       # 0.449 -> no SC
+1 - poisson.pmf(0, mu=0.8)   # 0.551 -> at least one SC`,q:"With an average of 0.8 safety cars per race, what's the chance of at least one?",a:"About 55%."},
+{t:"SQL",h:"SELECT, WHERE, GROUP BY, HAVING",b:"WHERE filters rows before grouping; HAVING filters groups after aggregation.",c:`SELECT team, COUNT(*) AS wins
+FROM results
+WHERE position = 1 AND season = 2024
+GROUP BY team
+HAVING COUNT(*) >= 3
+ORDER BY wins DESC;`,q:"Why can't WHERE COUNT(*) >= 3 work?",a:"WHERE runs before grouping, so the count doesn't exist yet."},
+{t:"SQL",h:"INNER vs LEFT JOIN",b:"INNER JOIN keeps rows that match in both tables. LEFT JOIN keeps every row from the left table and fills missing matches with NULL.",c:`SELECT r.driver, c.circuit
+FROM results r
+JOIN races c ON c.race_id = r.race_id
+WHERE r.position = 1;`,q:"Which join lists every race, even ones with no result recorded yet?",a:"races LEFT JOIN results."},
+{t:"SQL",h:"Window functions: RANK and LAG",b:"Window functions calculate over related rows without collapsing them. LAG compares each lap with the previous one.",c:`SELECT driver, lap,
+       lap_time - LAG(lap_time) OVER (PARTITION BY driver
+                                      ORDER BY lap) AS delta,
+       RANK() OVER (PARTITION BY team ORDER BY points DESC) AS team_rank
+FROM laps;`,q:"What does delta show for each lap?",a:"How much slower (+) or faster (−) that lap was than the driver's previous lap."},
+{t:"Excel",h:"Pivot tables",b:"A pivot table is GROUP BY with drag and drop: Rows = team, Columns = season, Values = sum of points. Add slicers to filter interactively.",c:`Rows    : Team
+Columns : Season
+Values  : Sum of Points
+Slicer  : Circuit type`,q:"What SQL clause does a pivot table's Rows area replace?",a:"GROUP BY."},
+{t:"Excel",h:"INDEX/MATCH over VLOOKUP",b:"VLOOKUP only looks to the right and breaks when columns are inserted. INDEX/MATCH looks in any direction and survives structure changes.",c:`=INDEX(Drivers!B:B, MATCH(A2, Drivers!A:A, 0))`,q:"What does the 0 in MATCH mean?",a:"Exact match."},
+{t:"F1 Data",h:"Stint analysis and degradation slope",b:"Plot lap time against tyre age for one stint and fit a straight line. The slope is the degradation in seconds per lap.",c:`ver = laps.pick_drivers("VER").pick_wo_box().pick_quicklaps()
+s2 = ver[ver["Stint"] == 2]
+x = s2["TyreLife"].to_numpy()
+y = s2["LapTime"].dt.total_seconds().to_numpy()
+deg, base = np.polyfit(x, y, 1)`,q:"A slope of 0.08 means what?",a:"The car loses about 0.08 s per lap as the tyre ages."},
+{t:"F1 Strategy",h:"Fuel-corrected degradation",b:"The car gets lighter every lap (rule of thumb: about 0.03 s per kg, roughly 0.06 s per lap). That hides tyre wear, so raw stint slopes underestimate degradation. Add the fuel effect back before fitting.",c:`k = 0.06    # s gained per lap from fuel burn (assumption)
+s2["fc"] = s2["LapTime"].dt.total_seconds() + k * s2["LapNumber"]
+deg = np.polyfit(s2["TyreLife"], s2["fc"], 1)[0]`,q:"Why does the raw slope underestimate degradation?",a:"Fuel burn makes later laps faster, cancelling part of the tyre loss."},
+{t:"F1 Strategy",h:"Pit loss per track",b:"Pit loss is the time lost driving through the pit lane and stopping compared with staying on track. It is usually around 20–25 s and varies by circuit (pit lane length and speed limit).",c:`pit_loss ≈ (in_lap + out_lap) - 2 * typical_racing_lap`,q:"Why is pit loss different at every track?",a:"Pit lane length, speed limit and entry/exit layout differ."},
+{t:"F1 Strategy",h:"Undercut and overcut",b:"Undercut: pit first and use fresh-tyre pace to jump a rival who stays out on old tyres. Overcut: stay out and gain when the rival's new tyres are slow to warm up or they rejoin in traffic.",c:`undercut works if:
+(rival old-tyre lap - your new-tyre lap) x laps before they pit > gap`,q:"Name one reason an undercut fails.",a:"Fresh tyres don't warm up quickly, you rejoin in traffic, or the tyre delta is too small."},
+{t:"Race Simulation",h:"Find the best single pit lap",b:"Brute force: simulate every possible pit lap, add up lap times plus the pit loss, and pick the lowest total.",c:`import numpy as np
+N, pit_loss = 57, 22.0
+def stint(n, base, deg):
+    return np.sum(base + deg * np.arange(n))
+totals = {p: stint(p, 92.0, 0.10) + pit_loss + stint(N - p, 92.6, 0.05)
+          for p in range(10, 48)}
+best = min(totals, key=totals.get)`,q:"In this one-stop model, does a bigger pit loss change the best lap?",a:"No: every option pays it once. It matters when comparing 1-stop vs 2-stop."},
+{t:"Machine Learning",h:"Overfitting and bias–variance",b:"Underfitting (high bias): too simple, bad everywhere. Overfitting (high variance): memorises noise, great on train, poor on new races.",c:`train MAE 0.05 s, test MAE 0.60 s  -> overfitting
+train MAE 0.55 s, test MAE 0.58 s  -> underfitting`,q:"Train error tiny, test error large: which problem?",a:"Overfitting (high variance)."},
+{t:"Machine Learning",h:"Ridge and Lasso",b:"Regularisation penalises large weights. Ridge (L2) shrinks them all; Lasso (L1) can set some exactly to zero, dropping useless features.",c:`from sklearn.linear_model import Ridge, Lasso
+Ridge(alpha=1.0).fit(X_train, y_train)
+Lasso(alpha=0.01).fit(X_train, y_train).coef_`,q:"Which one removes features automatically?",a:"Lasso (L1)."},
+{t:"Machine Learning",h:"Logistic regression and thresholds",b:"Despite its name, logistic regression classifies. It outputs a probability between 0 and 1; the threshold turns it into a decision such as pit now or stay out.",c:`p = model.predict_proba(X_test)[:, 1]
+pit_now = p >= 0.3      # lower threshold = catch more cases`,q:"Lowering the threshold from 0.5 to 0.3 raises which metric?",a:"Recall (more positives caught, more false alarms)."},
+{t:"Machine Learning",h:"Decision trees",b:"A tree asks yes/no questions at each split, so you can trace exactly why it made a prediction. Deep trees overfit; limit max_depth.",c:`from sklearn.tree import DecisionTreeClassifier, plot_tree
+tree = DecisionTreeClassifier(max_depth=3).fit(X, y)
+plot_tree(tree, feature_names=X.columns)`,q:"What happens if you remove the depth limit?",a:"The tree keeps splitting until it memorises the training data (overfits)."},
+{t:"Machine Learning",h:"Random forests",b:"Many trees, each trained on a random sample of rows and features, vote together. Their individual errors partly cancel, so the forest beats any single tree.",c:`from sklearn.ensemble import RandomForestClassifier
+rf = RandomForestClassifier(n_estimators=300, random_state=0).fit(X, y)
+pd.Series(rf.feature_importances_, X.columns).sort_values()`,q:"Why does averaging many weak trees help?",a:"Their mistakes are different, so averaging reduces variance."},
+{t:"Machine Learning",h:"Precision vs recall",b:"Precision: of what I flagged, how much was right? Recall: of all real cases, how many did I catch? Accuracy misleads when one class is rare.",c:`20 real incidents; model flags 10, 8 are real
+precision = 8/10 = 0.80
+recall    = 8/20 = 0.40`,q:"For detecting a car failure risk, which matters more?",a:"Recall: missing a real failure is the costly error."},
+{t:"Machine Learning",h:"Cross-validation by race",b:"Laps from the same race are correlated (same track, weather, cars). Random folds leak information. GroupKFold keeps each race entirely in train or in test.",c:`from sklearn.model_selection import GroupKFold, cross_val_score
+cv = GroupKFold(n_splits=5)
+cross_val_score(model, X, y, cv=cv, groups=df["race_id"])`,q:"Why not shuffle all laps into random folds?",a:"Laps from one race would be in both train and test, making the score look better than it is."},
+{t:"Machine Learning",h:"Hyperparameter search",b:"Parameters are learned (weights). Hyperparameters are set by you (depth, number of trees). Grid search tries every combination; random search samples them and is often as good, much faster.",c:`grid = {"n_estimators": [100, 200, 400],
+        "max_depth": [3, 5, None],
+        "min_samples_split": [2, 5]}
+GridSearchCV(rf, grid, cv=5)`,q:"How many fits does this grid need?",a:"3 × 3 × 2 = 18 combinations × 5 folds = 90 fits."},
+{t:"Machine Learning",h:"Clustering laps with K-Means",b:"With no labels, K-Means groups similar laps (push laps, managed laps, degraded laps). Scale features first, then use the elbow plot to choose K.",c:`from sklearn.cluster import KMeans
+X = StandardScaler().fit_transform(laps[["LapS", "TyreLife"]])
+inertia = [KMeans(k, n_init=10, random_state=0).fit(X).inertia_
+           for k in range(1, 8)]`,q:"Name one weakness of K-Means.",a:"It assumes round, similar-sized clusters and needs K chosen in advance."},
+{t:"Machine Learning",h:"PCA: fewer features, same information",b:"PCA finds the directions with the most variance and projects the data onto the top few. Useful when telemetry gives you dozens of correlated channels.",c:`from sklearn.decomposition import PCA
+pca = PCA(n_components=0.95).fit(X_scaled)   # keep 95% variance
+pca.n_components_`,q:"What does n_components=0.95 do?",a:"Keeps as many components as needed to explain 95% of the variance."},
+{t:"EDA & Viz",h:"Start with a question, then pick the chart",b:"EDA without a question produces 50 unrelated charts. Ask something specific, then choose: line for trends, bar for comparisons, histogram for distributions, scatter for relationships.",c:`"Which compound was fastest after 15 laps?"
+-> box plot of lap time by compound, laps 15+`,q:"Which chart shows lap time against tyre age?",a:"A scatter plot (optionally with a fitted line)."},
+{t:"F1 Data",h:"Comparing telemetry by distance",b:"Two drivers are at different points of the track at the same second, so align their telemetry by distance. The speed traces show who brakes later and who carries more corner speed.",c:`q = fastf1.get_session(2024, "Bahrain", "Q"); q.load()
+a = q.laps.pick_drivers("LEC").pick_fastest()
+b = q.laps.pick_drivers("SAI").pick_fastest()
+ta = a.get_car_data().add_distance()
+tb = b.get_car_data().add_distance()
+# plot ta.Distance vs ta.Speed and tb.Distance vs tb.Speed`,q:"Why align by distance rather than time?",a:"At the same moment the cars are at different places on track; distance compares the same corner."},
+{t:"Feature Engineering",h:"Features for a lap-time model",b:"Domain knowledge enters a model through features: tyre age (and age² if degradation accelerates), compound, fuel proxy (laps remaining), track temperature, gap to the car ahead (dirty air).",c:`df["age2"] = df["TyreLife"] ** 2
+df["laps_left"] = N - df["LapNumber"]
+df["in_traffic"] = (df["gap_ahead"] < 1.0).astype(int)
+df = pd.get_dummies(df, columns=["Compound"])`,q:"Why might one-hot encoding fail for 'Circuit' with 24 values?",a:"It creates many sparse columns (high cardinality); target or grouped encoding can work better."},
+{t:"Time Series",h:"Time order matters",b:"In a time series, order is the signal. Never split randomly: train on the past, test on the future, or you leak tomorrow into today.",c:`from sklearn.model_selection import TimeSeriesSplit
+for train_idx, test_idx in TimeSeriesSplit(n_splits=5).split(X):
+    ...`,q:"How should you split a race's laps for testing a forecast?",a:"Train on earlier laps, test on later laps."},
+{t:"Time Series",h:"Autocorrelation",b:"Autocorrelation measures how much a series resembles a lagged copy of itself. Tyre degradation is gradual, so lap times show strong short-lag autocorrelation.",c:`from statsmodels.graphics.tsaplots import plot_acf
+plot_acf(stint_lap_times, lags=10)`,q:"What does a white-noise ACF look like?",a:"No significant bars after lag 0."},
+{t:"Time Series",h:"ARIMA in one minute",b:"AR uses past values, I differences the series to make it stationary, MA uses past errors. ARIMA(p, d, q) sets each order.",c:`from statsmodels.tsa.arima.model import ARIMA
+fit = ARIMA(y_train, order=(1, 1, 1)).fit()
+fit.forecast(steps=10)`,q:"What does differencing (d = 1) do?",a:"Replaces each value with its change from the previous one, removing the trend."},
+{t:"Time Series",h:"Beat the naive forecast",b:"Always compare with a naive baseline: next lap = this lap. A model that can't beat it is not useful.",c:`naive = y_test.shift(1).fillna(y_train.iloc[-1])
+mae_naive = (y_test - naive).abs().mean()
+mae_model = (y_test - forecast).abs().mean()`,q:"Your ARIMA MAE is 0.31 s, naive is 0.28 s. Verdict?",a:"The model is worse than the baseline; don't use it."},
+{t:"Probability",h:"Bayesian updating of degradation",b:"Start with a prior from practice, then update with each race lap. The estimate shifts toward the race data as more laps arrive.",c:`prior_m, prior_sd = 0.08, 0.03      # practice
+obs_m, obs_sd, n  = 0.12, 0.05, 8   # 8 race laps
+w_p, w_d = 1/prior_sd**2, n/obs_sd**2
+post = (w_p*prior_m + w_d*obs_m) / (w_p + w_d)   # ≈ 0.11 s/lap`,q:"What happens to the estimate as n grows?",a:"It moves toward the observed race value (0.12)."},
+{t:"F1 Strategy",h:"Track evolution and temperature",b:"As rubber builds up, the track gets faster over a session and a weekend. Hotter track temperatures usually increase thermal degradation.",c:`practice long runs (cool, green track)
+-> race (more rubber, different temperature)
+-> adjust deg estimates before the race`,q:"Why are late qualifying runs usually faster?",a:"More rubber on the racing line gives more grip (track evolution)."},
+{t:"F1 Strategy",h:"Dirty air and track position",b:"Following closely costs downforce and overheats tyres. At circuits where overtaking is hard, track position is worth more than fresh tyres.",c:`Monaco   : track position is king
+Bahrain  : fresh tyres can win positions back`,q:"At Monaco, would you trade position for fresher tyres?",a:"Rarely; overtaking is so hard that position is usually worth more."},
+{t:"F1 Strategy",h:"Safety car and VSC windows",b:"Under SC or VSC the field is slower, so a pit stop costs much less time. A safety car also bunches the field, erasing gaps.",c:`green pit loss ≈ 22 s
+under SC       ≈ about half
+decide in about 10 seconds`,q:"What does a safety car do that a VSC doesn't?",a:"It bunches the field together, wiping out gaps."},
+{t:"F1 Strategy",h:"Tyre offset and free air",b:"Tyre offset is the age difference between your tyres and a rival's. Where you rejoin matters: free air lets you use the new tyre; traffic wastes it.",c:`rejoin position = current gap - pit loss
+check: who is in that gap?`,q:"Why check traffic before calling a stop?",a:"Rejoining behind slower cars wastes the fresh-tyre advantage."},
+{t:"F1 Strategy",h:"Covering vs splitting",b:"Covering: copy the rival's strategy to protect position. Splitting: choose a different strategy to create a chance, often with two cars or when you have nothing to lose.",c:`leader       -> cover the car behind
+chasing team -> split strategies across two cars`,q:"Why does the leader usually cover?",a:"Matching the rival removes their chance to gain through strategy."},
+{t:"F1 Strategy",h:"Wet/dry crossover",b:"The crossover is the moment slick tyres become faster than intermediates (or inters faster than wets). Teams watch sector times of anyone who gambles early.",c:`if slick_lap < inter_lap and gain over remaining laps > pit loss:
+    pit for slicks`,q:"What data tells you the crossover has arrived?",a:"Sector and lap times of drivers already on the other tyre."},
+{t:"Regulations",h:"Sporting rules strategists use",b:"Key rules include: in a dry race each driver must use at least two different dry compounds; teams may change tyres during a red flag; there is a pit lane speed limit; time penalties can be served at a stop. Always check the current FIA Sporting Regulations.",c:`dry race      -> 2 dry compounds minimum
+red flag      -> tyre change allowed (a "free stop")
+5 s penalty   -> served at the stop or added to race time`,q:"Why can a red flag help a driver who hasn't pitted yet?",a:"They can change tyres during the stoppage without losing pit-stop time."},
+{t:"Regulations",h:"2026 energy management",b:"From 2026 power is split roughly 50/50 between combustion engine and electric motor, and the MGU-H is gone. Drivers must choose where to harvest and where to deploy energy. Active aero gives a low-drag mode on straights, and DRS is replaced by an overtake mode with extra electrical energy for the chasing car.",c:`harvest  : braking zones, lift and coast
+deploy   : exits and straights
+overtake : extra energy when close behind`,q:"What replaced DRS in 2026?",a:"An overtake (manual override) mode giving extra electrical energy, plus active aero for everyone."},
+{t:"F1 Strategy",h:"Downforce vs drag",b:"Downforce gives cornering grip but adds drag on straights. High downforce suits twisty tracks (Monaco, Hungary); low drag suits fast tracks (Monza, Spa).",c:`Monza  : thin wings, high top speed
+Monaco : maximum wing, corner speed`,q:"Why does a team run less wing at Monza?",a:"Long straights reward top speed more than corner grip."},
+{t:"Race Simulation",h:"A lap-time model per car",b:"A simulator builds each lap from parts: base pace + tyre degradation − fuel effect − track evolution + traffic penalty + random noise.",c:`def lap_time(lap, age, base=91.0, deg=0.07, fuel=0.06,
+             evo=0.02, traffic=False, rng=np.random.default_rng()):
+    t = base + deg*age - fuel*lap - evo*lap
+    if traffic:
+        t += 0.5
+    return t + rng.normal(0, 0.25)`,q:"Which term makes laps faster as the race goes on?",a:"The fuel (and track evolution) term."},
+{t:"Race Simulation",h:"Monte Carlo with safety cars",b:"Run the race thousands of times with random events and compare the average outcome of each strategy, not one lucky run.",c:`rng = np.random.default_rng(42)
+p_sc, runs = 0.012, 10_000          # SC chance per lap
+def pit_cost(flexible):
+    sc = rng.random(57) < p_sc
+    if flexible and sc[15:40].any():
+        return 11.0                  # cheap stop under SC
+    return 22.0
+fixed = np.mean([pit_cost(False) for _ in range(runs)])   # 22.0
+flex  = np.mean([pit_cost(True)  for _ in range(runs)])   # ≈ 19`,q:"Why run 10,000 races instead of one?",a:"One run is luck; many runs give the expected result and its spread."},
+{t:"Race Simulation",h:"Turning race rates into lap probabilities",b:"If a track averages 0.7 safety cars per race over 57 laps, the chance of one starting on a given lap is about 1 − e^(−0.7/57).",c:`import math
+p_lap = 1 - math.exp(-0.7 / 57)   # ≈ 0.012`,q:"Why not just divide 0.7 by 57?",a:"For small rates it's almost the same; the formula stays correct when rates are larger."},
+{t:"Race Simulation",h:"Overtaking probability",b:"Model the chance of passing as a function of pace advantage and circuit difficulty, for example with a logistic curve.",c:`def p_overtake(pace_delta, difficulty):
+    z = -2.0 + 3.0*pace_delta - 1.5*difficulty
+    return 1 / (1 + np.exp(-z))`,q:"What is the probability when z = 0?",a:"0.5."},
+{t:"Optimisation",h:"Dynamic programming for strategy",b:"Instead of testing every full strategy, break the race into states (lap, compound, tyre age, stops used) and compute the best time from each state once.",c:`best[lap][compound][age] =
+    min( stay_out -> best[lap+1][compound][age+1],
+         pit_to_X -> pit_loss + best[lap+1][X][0] )`,q:"Why is this faster than brute force?",a:"Each state is solved once and reused instead of recomputing every path."},
+{t:"Python",h:"Fast simulations with Numba",b:"Numba compiles Python loops to machine code with one decorator, so thousands of race simulations run in seconds.",c:`from numba import njit
+@njit
+def stint_time(base, deg, n):
+    t = 0.0
+    for lap in range(n):
+        t += base + deg * lap
+    return t`,q:"Why is the first call slower than later ones?",a:"Numba compiles the function on the first call."},
+{t:"Decision Theory",h:"Reacting to a rival",b:"Game theory frames a pit call as your options against the rival's. Choose the move that does best across their likely responses.",c:`               rival pits   rival stays
+you pit           hold P1      gain
+you stay          lose P1      hold P1`,q:"Why does pitting look safe for the leader here?",a:"It never loses position in either column."},
+{t:"F1 Data",h:"OpenF1 API",b:"OpenF1 is a free REST API with live and historical data: laps, stints, pit stops, intervals, car data and team radio. Ask with requests, convert JSON to a DataFrame.",c:`import requests, pandas as pd
+base = "https://api.openf1.org/v1"
+stints = pd.DataFrame(requests.get(f"{base}/stints",
+             params={"session_key": "latest"}).json())`,q:"When is OpenF1 better than FastF1?",a:"For live or near-live data during a session."},
+{t:"Data Engineering",h:"An auto-updating race dataset",b:"After each race weekend, a script checks which rounds you already have, downloads only the missing ones and saves them as Parquet. Running it twice changes nothing (idempotent).",c:`from pathlib import Path
+sched = fastf1.get_event_schedule(2026, include_testing=False)
+for rnd in sched[sched["EventDate"] < pd.Timestamp.now()]["RoundNumber"]:
+    out = Path(f"data/2026_R{rnd:02d}.parquet")
+    if out.exists():
+        continue
+    s = fastf1.get_session(2026, int(rnd), "R")
+    s.load(telemetry=False)
+    s.laps.to_parquet(out)`,q:"What makes this script safe to run every Monday?",a:"It skips rounds already saved, so reruns don't duplicate data."},
+{t:"APIs & Apps",h:"Serve a model with FastAPI",b:"FastAPI validates inputs with Pydantic and documents your API at /docs. Load the model once at startup.",c:`from fastapi import FastAPI
+from pydantic import BaseModel
+import joblib
+app = FastAPI()
+model = joblib.load("lap_model.joblib")
+
+class Lap(BaseModel):
+    tyre_age: int
+    compound: str
+    fuel_kg: float
+
+@app.post("/predict")
+def predict(x: Lap):
+    return {"lap_time": float(model.predict([[x.tyre_age, x.fuel_kg]])[0])}`,q:"Why load the model outside the function?",a:"Loading it on every request would be slow."},
+{t:"APIs & Apps",h:"Streamlit dashboards",b:"Streamlit turns a Python script into a web app with widgets and charts, no HTML or JavaScript needed.",c:`import streamlit as st
+age = st.slider("Tyre age (laps)", 1, 50, 10)
+compound = st.selectbox("Compound", ["SOFT", "MEDIUM", "HARD"])
+st.metric("Predicted lap", f"{predict(age, compound):.3f} s")
+st.line_chart(curve, x="age", y="lap_time")`,q:"What happens when the user moves the slider?",a:"Streamlit reruns the script and redraws with the new value."},
+{t:"Race Simulation",h:"Live re-optimisation each lap",b:"During a race the strategist reruns the simulator every lap with the latest state (gaps, tyre ages, weather) and compares pit now vs stay out.",c:`each lap:
+  state = live gaps, tyre ages, SC status
+  sims  = monte_carlo(state, options=["pit now", "stay out"])
+  show expected position and risk for each`,q:"Why must the simulator run in seconds?",a:"The decision window is often just a few seconds before the pit entry."},
+{t:"MLOps",h:"Model drift in F1",b:"Data drift: inputs change (new track, new tyre range). Concept drift: the relationship changes (2026 regulations change how lap time responds to energy use). Monitor errors and retrain.",c:`monitor: prediction error per race
+         feature distributions vs training
+retrain when error rises above a threshold`,q:"New 2026 regulations: data drift or concept drift?",a:"Concept drift: the same inputs now lead to different lap times."},
+{t:"MLOps",h:"Track experiments with MLflow",b:"Log every training run's parameters, metrics and model so you can compare runs and reproduce the best one.",c:`import mlflow
+with mlflow.start_run():
+    mlflow.log_param("max_depth", 6)
+    mlflow.log_metric("mae_s", 0.21)
+    mlflow.sklearn.log_model(model, "model")`,q:"What three things should each run log?",a:"Parameters, metrics and the model."},
+{t:"Big Data",h:"When to use Spark",b:"Pandas needs the data to fit in RAM. Seasons of high-frequency telemetry can reach hundreds of gigabytes; Spark splits the work across many machines.",c:`from pyspark.sql import functions as F
+tel = spark.read.parquet("telemetry/")
+tel.groupBy("Driver").agg(F.max("Speed"))`,q:"Rough rule for switching from pandas to Spark?",a:"When the data no longer fits comfortably in one machine's memory."},
+{t:"Deep Learning",h:"Neural networks and ReLU",b:"Each layer computes weighted sums followed by an activation. Without activations, stacked layers collapse into one linear model. ReLU (max(0, x)) is the standard choice for hidden layers.",c:`import torch.nn as nn
+net = nn.Sequential(nn.Linear(5, 32), nn.ReLU(), nn.Linear(32, 1))`,q:"How many weights and biases does this network have?",a:"5×32 + 32 + 32×1 + 1 = 225."},
+{t:"Deep Learning",h:"Backpropagation",b:"Backprop works out how much each weight contributed to the error by applying the chain rule backwards through the network. The optimiser then nudges every weight to reduce the error.",c:`loss = criterion(net(X), y)
+loss.backward()      # compute gradients
+optimizer.step()     # update weights
+optimizer.zero_grad()`,q:"What does loss.backward() compute?",a:"The gradient of the loss with respect to every weight."},
+{t:"Deep Learning",h:"CNNs and transfer learning",b:"Convolutions slide small filters over an image, reusing the same weights everywhere. Transfer learning reuses a network trained on millions of images and retrains only the last layer.",c:`from torchvision.models import resnet18
+m = resnet18(weights="DEFAULT")
+for p in m.parameters():
+    p.requires_grad = False
+m.fc = nn.Linear(m.fc.in_features, 3)   # e.g. 3 tyre states`,q:"How many parameters does a layer of 32 filters of 3×3 on a grayscale image have?",a:"32 × (9 + 1) = 320."},
+{t:"NLP",h:"Team radio and sentiment",b:"Embeddings place words with similar meaning close together. Off-the-shelf sentiment models struggle with racing slang (\"box box\", \"tyres are gone\") and sarcasm, so fine-tune on labelled radio messages.",c:`from transformers import pipeline
+clf = pipeline("sentiment-analysis")
+clf("My tyres are gone, I can't hold him")`,q:"Name one reason a generic sentiment model fails on team radio.",a:"Domain slang and short, noisy messages it never saw in training."},
+{t:"Computer Vision",h:"Vision for F1",b:"Cameras can measure things sensors don't: tyre wear and graining from onboard footage, rival car upgrades, track surface condition. Data augmentation (crops, brightness, blur) makes models robust to new conditions.",c:`transforms.Compose([
+    transforms.RandomResizedCrop(224),
+    transforms.ColorJitter(brightness=0.3),
+    transforms.GaussianBlur(3),
+])`,q:"Why use brightness augmentation for trackside images?",a:"Lighting changes with time, weather and night races."},
+{t:"A/B Testing",h:"Testing an upgrade fairly",b:"Comparing races 1–5 (old wing) with races 6–10 (new wing) mixes the upgrade with different tracks, weather and tyres. Control the confounders or compare like with like.",c:`confounders: circuit, temperature, fuel, track evolution, driver
+better: same session, back-to-back runs, both specs`,q:"Why isn't 'old wing races 1–5 vs new wing races 6–10' valid?",a:"Track and conditions change too, so you can't attribute the difference to the wing."},
+{t:"A/B Testing",h:"Significance, effect size and power",b:"A tiny p-value doesn't mean a big effect. Power is the chance of detecting a real effect; small samples (20 races) often can't.",c:`from statsmodels.stats.power import TTestIndPower
+TTestIndPower().solve_power(effect_size=0.3/1.5, power=0.8, alpha=0.05)
+# ≈ 394 per group`,q:"\"We found no significant difference\" in 10 races. Does the upgrade not work?",a:"Not necessarily: the test may have too little power to detect it."},
+{t:"BI & Dashboards",h:"A dashboard for a race engineer",b:"Start from the decision, not the data. Show only what changes the next call: gaps, tyre ages, predicted pit-window and the cost of stopping now.",c:`screen 1: gap ahead/behind, tyre age, deg, pit window, SC status
+screen 2: sector trends, rival stints, weather radar
+remove  : anything that doesn't change a decision`,q:"What should a race dashboard highlight?",a:"What has changed and what needs a decision now."},
+{t:"BI & Dashboards",h:"Power BI vs Python",b:"Power BI and Tableau are fast for recurring reports that business users update themselves. Python is for custom logic, models and automation.",c:`weekly standings report -> Power BI
+live pit-window model   -> Python (Streamlit / Plotly)`,q:"A model-driven pit-window tool: Power BI or Python?",a:"Python, because it needs custom logic and the model."},
+{t:"F1 Data",h:"Professional telemetry tools",b:"F1 and junior series analyse data in tools such as ATLAS, MoTeC i2 and Pi Toolbox. Knowing their workflow (overlays, math channels, lap comparison) helps in interviews.",c:`overlay laps     -> compare braking points
+math channels    -> derived signals (e.g. slip)
+lap/sector delta -> where time is lost`,q:"What is a math channel?",a:"A signal calculated from other channels, such as a ratio or difference."}
+];
+const DAY0=new Date(2026,0,1);
+function dayNum(){return Math.round((dayStart(new Date())-DAY0)/864e5)}
+const pick=(arr,off)=>{const n=arr.length,i=((dayNum()+off)%n+n)%n;return [arr[i],i]};
+const L0=Math.round((new Date(2026,9,26)-DAY0)/864e5);
+function buildSeq(base,extras){const out=base.slice(),per={};
+  extras.slice().sort((a,b)=>a.day-b.day||(a.ts||0)-(b.ts||0)).forEach(x=>{
+    const k=per[x.day]=(per[x.day]||0)+1,n=out.length,d=x.day-L0;
+    out.splice(Math.min(n,((d%n)+n)%n+k),0,x.item)});
+  return out}
+function wordSeq(){const C=(state&&state.custom)||{},N=(state&&state.notion)||{};
+  const ex=[...(C.words||[]).map(x=>({day:x.day,ts:x.ts,item:[x.fr,x.type||"",x.en||"",x.it||"",x.ex||"",x.topic||"Mes mots","you"]})),
+            ...(N.words||[]).map(x=>({day:x.day,ts:x.ts,item:[x.fr,x.type||"",x.en||"",x.it||"",x.ex||"",x.topic||"Notion","notion"]}))];
+  return buildSeq(WORDS,ex)}
+function lessonSeq(){const C=(state&&state.custom)||{},N=(state&&state.notion)||{};
+  const ex=[...(C.lessons||[]).map(x=>({day:x.day,ts:x.ts,item:{...x,id:"c:"+x.id,src:"you"}})),
+            ...(N.lessons||[]).map(x=>({day:x.day,ts:x.ts,item:{...x,id:"n:"+x.id,src:"notion"}}))];
+  return buildSeq(LESSONS.map((l,i)=>({...l,id:"f"+i})),ex)}
+const rot=(s,off)=>{const n=s.length,i=(((dayNum()-L0+off)%n)+n)%n;return [s[i],i,n]};
+const pickWord=off=>rot(wordSeq(),off);
+const pickLesson=off=>rot(lessonSeq(),off);
+const NOTION_VOCAB="https://app.notion.com/p/7024bc43e7b24174930a8855da31e73c?v=4baccc9fa8c0481fbf3a16678c785d27";
+const NOTION_Q="https://app.notion.com/p/df381cce3a2d4b7c84d257b72b247170?v=8904357a0bb34948a35f8e529bc49ee7";
+const NOTION_PAGE="https://app.notion.com/p/405a25870bab81c6b43ee02a582e3e91";
+const unmd=v=>String(v??"").replace(/\\([\\`*_{}\[\]()#+\-.!|~<>=])/g,"$1").trim();
+async function queryView(mcp,view){let rows=[],cursor=null,guard=0;
+  do{const data={mode:"view",view_url:view,page_size:100};if(cursor)data.start_cursor=cursor;
+    const r=await mcp.callTool("Notion","notion-query-data-sources",{data},{cache:false});
+    let p=r&&r.payload;if(typeof p==="string"){const i=p.indexOf("{");try{p=JSON.parse(p.slice(i))}catch(e){throw {code:"bad_shape"}}}
+    if(!p||!Array.isArray(p.results))throw {code:"bad_shape"};
+    rows=rows.concat(p.results);cursor=p.has_more&&p.next_cursor?p.next_cursor:null;
+  }while(cursor&&++guard<20);return rows}
+const SYNC_MSG={server_not_connected:"Notion isn't connected. Add it in claude.ai Settings → Connectors, then tap Sync.",
+  needs_reauth:"Notion needs reconnecting in claude.ai Settings → Connectors.",
+  selection_required:"Choose which Notion connection to use when claude.ai asks, then tap Sync.",
+  not_in_manifest:"Notion access is turned off for this app. Allow it from the app's Permissions menu, then tap Sync.",
+  approval_required:"Allow Notion access when claude.ai asks, then tap Sync again.",
+  blocked_by_policy:"Your organisation's policy blocks Notion here.",
+  server_unavailable:"Notion didn't respond. Try again in a minute.",
+  bad_shape:"Notion sent data in an unexpected format. Check the column names in Notion."};
+function applyNotion(words,lessons,updated,auto){
+  const today=dayNum(),now=Date.now(),old=state.notion||{words:[],lessons:[]};
+  const keep=(list,id)=>(list||[]).find(x=>x.id===id);
+  const stamp=(x,list,i)=>{const o=keep(list,x.id);return {...x,day:o?o.day:today,ts:o?o.ts:now+i}};
+  const W=words.filter(w=>w&&w.id&&w.fr).map((w,i)=>stamp(w,old.words,i));
+  const Q=lessons.filter(l=>l&&l.id&&l.h).map((l,i)=>stamp(l,old.lessons,i));
+  const added=W.filter(w=>!keep(old.words,w.id)).length+Q.filter(l=>!keep(old.lessons,l.id)).length;
+  const changed=JSON.stringify([old.words,old.lessons])!==JSON.stringify([W,Q]);
+  state.notion={words:W,lessons:Q,syncedAt:now,updated:updated||old.updated||null};
+  ui.sync=added?{st:"ok",msg:`Synced: ${added} new item${added>1?"s":""} from Notion. They show up from tomorrow.`}:(auto?null:{st:"ok",msg:"Up to date with Notion."});
+  if(changed||!auto)commit();else render();
+}
+async function syncNotion(auto){
+  if(STANDALONE){
+    if(!auto){ui.sync={st:"busy",msg:"Checking for new Notion content…"};render()}
+    try{const r=await fetch("content.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error("http");
+      const d=await r.json();applyNotion(d.words||[],d.lessons||[],d.updated,auto)}
+    catch(e){if(auto)return;ui.sync={st:"err",msg:navigator.onLine===false?"You're offline. Sync again when you're connected.":"Couldn't load the Notion content. Check that the GitHub sync has run."};render()}
+    return;
+  }
+  const mcp=await window.claude?.use?.("mcp").catch(()=>null);
+  if(!mcp){if(!auto){ui.sync={st:"err",msg:"Sync works when the app is open in claude.ai and you're signed in."};render()}return}
+  ui.sync={st:"busy",msg:"Syncing with Notion…"};render();
+  try{
+    const [vw,qs]=await Promise.all([queryView(mcp,NOTION_VOCAB),queryView(mcp,NOTION_Q)]);
+    applyNotion(vw.map(r=>({id:r.url,fr:unmd(r.French),type:unmd(r.Type),en:unmd(r.English),it:unmd(r.Italian),ex:unmd(r.Example),topic:unmd(r.Topic)})),
+                qs.map(r=>({id:r.url,t:unmd(r.Topic)||"Notion",h:unmd(r.Title),b:unmd(r.Explanation),c:unmd(r.Code),q:unmd(r.Question),a:unmd(r.Answer)})),Date.now(),auto);
+  }catch(e){const c=e&&e.code;
+    if(c==="server_unavailable"&&e.retryable&&!auto&&!ui._retried){ui._retried=true;setTimeout(()=>{syncNotion(false)},1200+Math.random()*1500);return}
+    ui._retried=false;
+    ui.sync={st:"err",msg:SYNC_MSG[c]||(c==="tool_error"?"Notion reported an error: "+String(e.message||"").slice(0,140):"Sync failed. Try again later.")};render()}
+}
+const canSpeak=typeof window.speechSynthesis!=="undefined";
+function say(text,lang){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=lang;u.rate=.9;speechSynthesis.speak(u)}catch(e){toast("Audio isn't available here.")}}
+function offLabel(o){if(o===0)return "Today";const d=dayStart(new Date());d.setDate(d.getDate()+o);return shortDate(d)}
+
+// ---------- dates ----------
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const dayStart=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+function mondayOf(d){const x=dayStart(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+function keyFor(p,d){
+  if(p==="D")return "D:"+ymd(d);
+  if(p==="W")return "W:"+ymd(mondayOf(d));
+  if(p==="M")return "M:"+d.getFullYear()+"-"+pad(d.getMonth()+1);
+  if(p==="Q")return "Q:"+d.getFullYear()+"-Q"+(Math.floor(d.getMonth()/3)+1);
+  return "Y:"+d.getFullYear();
+}
+function stepBack(p,d){const x=dayStart(d);
+  if(p==="D")x.setDate(x.getDate()-1);else if(p==="W")x.setDate(x.getDate()-7);
+  else if(p==="M"){x.setDate(1);x.setMonth(x.getMonth()-1)}else if(p==="Q"){x.setDate(1);x.setMonth(x.getMonth()-3)}
+  else x.setFullYear(x.getFullYear()-1);return x}
+function periodEnd(p,d){const y=d.getFullYear(),m=d.getMonth();
+  if(p==="D")return new Date(y,m,d.getDate()+1);
+  if(p==="W"){const x=mondayOf(d);x.setDate(x.getDate()+7);return x}
+  if(p==="M")return new Date(y,m+1,1);
+  if(p==="Q")return new Date(y,(Math.floor(m/3)+1)*3,1);
+  return new Date(y+1,0,1)}
+function left(ms){const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4);
+  if(h>=48)return Math.floor(h/24)+"d "+(h%24)+"h";return h+"h "+pad(m)+"m"}
+function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const n=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-n);
+  const y0=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil(((t-y0)/864e5+1)/7)}
+const shortDate=d=>d.toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=()=>Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-4);
+
+// ---------- state ----------
+let state=null;            // {v,created,updated,items,history,goals,lists,notes,bg}
+let ui={tab:"tracker",period:"D",cat:"all",gcat:"all",sheet:null,armed:false,off:{q:0,w:0,l:0},reveal:false,sync:null};
+let ref=null, assets=null, sync="local", saveT=null, writing=Promise.resolve(), noteT=null;
+let localBg=null;
+
+function blank(){return norm({v:1,created:ymd(new Date()),updated:Date.now(),items:[],history:{},goals:[],lists:[],notes:{},bg:null,learned:{lessons:[],words:[]}})}
+function norm(s){if(s){if(!s.learned)s.learned={lessons:[],words:[]};s.learned.lessons=s.learned.lessons||[];s.learned.words=s.learned.words||[];if(!s.custom)s.custom={words:[],lessons:[]};s.custom.words=s.custom.words||[];s.custom.lessons=s.custom.lessons||[];if(!s.notion)s.notion={words:[],lessons:[],syncedAt:0}}return s}
+function lsLoad(){try{const s=localStorage.getItem(LS);return s?JSON.parse(s):null}catch(e){return null}}
+function lsSave(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
+try{localBg=localStorage.getItem(LS+"-bg")}catch(e){}
+
+function commit(rerender=true){
+  state.updated=Date.now();lsSave();
+  clearTimeout(saveT);saveT=setTimeout(()=>{saveT=null;dbSave()},500);
+  if(rerender)render();
+}
+function dbSave(){
+  if(!ref)return;
+  const body=JSON.parse(JSON.stringify(state));
+  writing=writing.then(()=>ref.set(body)).catch(e=>{
+    if(e&&e.code==="quota_exceeded")toast("Storage is full. Delete old lists or goals.");
+    else if(e&&e.code==="unavailable")setTimeout(dbSave,1500+Math.random()*1000);
+  });
+}
+
+// ---------- helpers ----------
+function rec(k){return state.history[k]}
+function isDone(it,d=new Date()){const r=rec(keyFor(it.period,d));return !!(r&&r.done.includes(it.id))}
+function streak(it){let d=new Date(),n=0;if(!isDone(it,d))d=stepBack(it.period,d);
+  while(n<2000&&isDone(it,d)){n++;d=stepBack(it.period,d)}return n}
+function itemsOf(p){return state.items.filter(i=>i.period===p)}
+function refreshTotals(p){const k=keyFor(p,new Date());const r=state.history[k]||{done:[],total:0};
+  const ids=itemsOf(p).map(i=>i.id);r.total=ids.length;r.done=r.done.filter(id=>ids.includes(id));state.history[k]=r}
+function dayPct(d){const k=ymd(d);
+  if(k<state.created||d>new Date())return null;
+  if(k===ymd(new Date())){const its=itemsOf("D");if(!its.length)return 0;return Math.round(100*its.filter(i=>isDone(i)).length/its.length)}
+  const r=rec("D:"+k);return r&&r.total?Math.round(100*Math.min(r.done.length,r.total)/r.total):0}
+function periodPct(p){const its=itemsOf(p);if(!its.length)return null;return Math.round(100*its.filter(i=>isDone(i)).length/its.length)}
+
+// ---------- render ----------
+const app=document.getElementById("app");
+function render(){
+  renderNav();applyBg();
+  if(!state){app.innerHTML='<div class="card"><div class="empty">Loading your goals…</div></div>';return}
+  const v={tracker:vTracker,goals:vGoals,lists:vLists,learn:vLearn,stats:vStats}[ui.tab];
+  app.innerHTML=vTop()+v();
+  renderSheet();
+}
+function renderNav(){
+  const t=[["tracker","Tracker"],["goals","Goals"],["lists","Lists"],["learn","Learn"],["stats","Progress"]];
+  document.getElementById("nav").innerHTML=t.map(([k,l])=>`<button data-act="nav" data-k="${k}" ${ui.tab===k?'aria-current="page"':""}>${ic[k]}${l}</button>`).join("");
+}
+function applyBg(){const el=document.getElementById("bg");const u=(state&&state.bg&&state.bg.url)||localBg;
+  el.style.backgroundImage=u?`url("${u}")`:"";el.hidden=!u}
+function vTop(){
+  const d=new Date();
+  const title={tracker:d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}),goals:"Long-term goals",lists:"Checklists",learn:"Learn something today",stats:"Your progress"}[ui.tab];
+  const sub=`Week ${isoWeek(d)} · Q${Math.floor(d.getMonth()/3)+1} ${d.getFullYear()} · ${sync==="cloud"?"Synced":"Saved on this device"}`;
+  return `<div class="top"><div><h1>${esc(title)}</h1><div class="sub">${sub}</div></div>
+    <div style="display:flex;gap:8px"><button class="iconbtn" data-act="backup" aria-label="Backup">${ic.backup}</button><button class="iconbtn" data-act="bg" aria-label="Background photo">${ic.img}</button></div></div>`;
+}
+function catChips(key){
+  return `<div class="chips">${[["all","All"],...Object.entries(CATS)].map(([k,l])=>`<button class="chip" data-act="cat" data-key="${key}" data-k="${k}" aria-pressed="${ui[key]===k}">${l}</button>`).join("")}</div>`;
+}
+function pvars(p){return `--pc:var(--p-${p});--pi:var(--p-${p}-ink)`}
+
+function vTracker(){
+  const p=ui.period,now=new Date();
+  const tabs=`<div class="tabs" role="tablist">${Object.keys(P).map(k=>{const its=itemsOf(k);const dn=its.filter(i=>isDone(i)).length;
+    return `<button class="tab" role="tab" style="${pvars(k)}" data-act="period" data-k="${k}" aria-selected="${ui.period===k}">${P[k]}<small>${dn}/${its.length}</small></button>`}).join("")}</div>`;
+  const all=itemsOf(p),its=all.filter(i=>ui.cat==="all"||i.cat===ui.cat);
+  const dn=all.filter(i=>isDone(i)).length,pct=all.length?dn/all.length:0;
+  const C=2*Math.PI*30;
+  const summary=`<div class="card" style="${pvars(p)}"><div class="summary">
+    <svg class="ring" viewBox="0 0 76 76"><circle class="trk" cx="38" cy="38" r="30" fill="none" stroke-width="8"/>
+    <circle class="val" cx="38" cy="38" r="30" fill="none" stroke-width="8" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct)}" transform="rotate(-90 38 38)"/>
+    <text x="38" y="44" text-anchor="middle">${Math.round(pct*100)}%</text></svg>
+    <div><div class="big">${dn} of ${all.length} done</div><div class="meta">${PU[p]} · resets in <span class="mono">${left(periodEnd(p,now)-now)}</span></div></div></div></div>`;
+  // reminder banner
+  let banner="";const dLeft=itemsOf("D").filter(i=>!isDone(i)).length;
+  if(dLeft&&now.getHours()>=18)banner=`<div class="banner">${ic.bell}${dLeft} daily goal${dLeft>1?"s":""} left. Resets at midnight (${left(periodEnd("D",now)-now)}).</div>`;
+  else{const wl=itemsOf("W").filter(i=>!isDone(i)).length;if(wl&&now.getDay()===0)banner=`<div class="banner">${ic.bell}${wl} weekly goal${wl>1?"s":""} left. Week resets tonight.</div>`}
+  const list=its.length?`<ul class="items">${its.map(i=>{const d=isDone(i),s=streak(i);
+    return `<li class="item${d?" done":""}" style="${pvars(p)}"><button class="check" role="checkbox" aria-checked="${d}" aria-label="${esc(i.title)}" data-act="toggle" data-id="${i.id}">${ic.check}</button>
+    <div class="body"><div class="t">${esc(i.title)}</div><div class="tags"><span class="cat">${CATS[i.cat]||"Other"}</span>${s?`<span class="streak">${ic.flame}${s}${SU[p]} streak</span>`:""}</div></div>
+    <button class="more" data-act="editItem" data-id="${i.id}" aria-label="Edit">${ic.dots}</button></li>`}).join("")}</ul>`
+    :`<div class="empty">${all.length?"No goals in this category.":`No ${P[p].toLowerCase()} goals yet. Add one below.`}</div>`;
+  const items=`<div class="card"><div class="card-head"><h2>${P[p]} goals</h2></div>${list}
+    <button class="add" data-act="newItem">+ Add ${P[p].toLowerCase()} goal</button></div>`;
+  const note=p==="D"?`<div class="card"><div class="card-head"><h2>Daily reflection</h2></div>
+    <textarea id="note" placeholder="What went well today? What will you improve tomorrow?">${esc(state.notes[ymd(now)]||"")}</textarea>
+    <div class="note-foot"><span>Saved automatically</span><button class="chip" data-act="pastNotes">Past notes</button></div></div>`:"";
+  const [qt]=pick(QUOTES,0);
+  const quote=`<div class="card"><p class="quote sm">“${esc(qt[0])}”</p><div class="by">${esc(qt[1])}</div></div>`;
+  const needBk=STANDALONE&&(state.items.length||state.goals.length)&&(!state.lastBackup||Date.now()-state.lastBackup>14*864e5);
+  const bk=needBk?`<button class="banner" data-act="backup" style="border:0;text-align:left;width:100%">${ic.backup}It's been a while since your last backup. Tap to download one.</button>`:"";
+  return quote+bk+tabs+banner+summary+catChips("cat")+items+note;
+}
+
+function stepper(k){const o=ui.off[k];return `<div class="stepper"><button data-act="shift" data-k="${k}" data-d="-1" aria-label="Previous">‹</button><span>${offLabel(o)}</span><button data-act="shift" data-k="${k}" data-d="1" aria-label="Next">›</button></div>`}
+function vLearn(){
+  const L=state.learned,C=state.custom,N=state.notion;
+  const [q]=pick(QUOTES,ui.off.q),[w,,wn]=pickWord(ui.off.w),[l,li,ln]=pickLesson(ui.off.l);
+  const seqIds=new Set(lessonSeq().map(x=>x.id));
+  const saved=L.words.includes(w[0]),done=L.lessons.includes(l.id),nLearned=L.lessons.filter(k=>seqIds.has(k)).length;
+  const badge=src=>src==="you"?`<span class="cat">Added by you</span>`:src==="notion"?`<span class="cat">From Notion</span>`:"";
+  const head=`<div class="hint mono">${nLearned}/${ln} lessons learned · ${L.words.length} words saved</div>`;
+  const nAdd=C.words.length+C.lessons.length,nNo=N.words.length+N.lessons.length;
+  const syncLine=ui.sync?`<div class="${ui.sync.st==="err"?"banner":"hint"}" style="margin-top:8px">${esc(ui.sync.msg)}</div>`
+    :`<div class="hint" style="margin-top:8px">${N.syncedAt?(N.updated?"Notion read "+new Date(N.updated).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · ":"")+"Last sync "+new Date(N.syncedAt).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"Not synced with Notion yet"}</div>`;
+  const yours=`<div class="card"><div class="card-head"><h2>Your content</h2><span class="hint mono">${nAdd} added · ${nNo} from Notion</span></div>
+    <div class="tools" style="margin-top:0"><button class="chip" data-act="addWord">+ Word</button><button class="chip" data-act="addQ">+ Question</button>
+    <button class="chip" data-act="sync" ${ui.sync&&ui.sync.st==="busy"?"disabled":""}>↻ Sync from Notion</button><button class="chip" data-act="manage">Manage</button></div>
+    ${syncLine}<div class="hint" style="margin-top:4px">New items show up from tomorrow in the daily rotation. Tap › to preview.</div></div>`;
+  const qc=`<div class="card"><div class="card-head"><span class="eyebrow">Motivation</span>${stepper("q")}</div>
+    <p class="quote">“${esc(q[0])}”</p><div class="by">${esc(q[1])}</div></div>`;
+  const wc=`<div class="card"><div class="card-head"><span class="eyebrow">Mot du jour · ${esc(w[5])}</span>${stepper("w")}</div>
+    <div class="word">${esc(w[0])}<span class="wtype">${esc(w[1])}</span></div>${badge(w[6])}
+    <div style="margin-top:10px">
+      ${w[2]?`<div class="wrow"><span class="lang en">EN</span><span>${esc(w[2])}</span></div>`:""}
+      ${w[3]?`<div class="wrow"><span class="lang it">IT</span><span style="font-weight:700">${esc(w[3])}</span></div>`:""}
+      ${w[4]?`<div class="wrow"><span class="lang fr">FR</span><span class="ex">${esc(w[4])}</span></div>`:""}
+    </div>
+    <div class="tools">${canSpeak?`<button class="chip" data-act="say" data-lang="fr-FR" data-txt="${esc(w[0]+(w[4]?". "+w[4]:""))}">${ic.speak}French</button>${w[3]?`<button class="chip" data-act="say" data-lang="it-IT" data-txt="${esc(w[3])}">${ic.speak}Italian</button>`:""}`:""}
+      <button class="chip" data-act="saveWord" data-k="${esc(w[0])}" aria-pressed="${saved}">${saved?ic.starOn+"Saved":ic.star+"Save word"}</button>
+      ${L.words.length?`<button class="chip" data-act="savedWords">My words (${L.words.length})</button>`:""}</div></div>`;
+  const lc=`<div class="card lesson"><div class="card-head"><span class="eyebrow">Lesson ${li+1}/${ln} · ${esc(l.t)}</span>${stepper("l")}</div>
+    ${badge(l.src)}<h3>${esc(l.h)}</h3>${l.b?`<p>${esc(l.b)}</p>`:""}${l.c?`<pre class="code">${esc(l.c)}</pre>`:""}
+    ${l.q?`<div class="quiz"><div class="eyebrow">Check yourself</div><div class="q">${esc(l.q)}</div>
+      ${ui.reveal?`<div class="a">${esc(l.a||"No answer added.")}</div>`:`<button class="btn ghost" data-act="reveal">Show answer</button>`}</div>`:""}
+    <div class="tools"><button class="${done?"btn ghost":"btn"}" data-act="learned" data-k="${esc(l.id)}">${done?"Learned ✓ (tap to undo)":"Mark as learned"}</button></div></div>`;
+  return head+yours+qc+wc+lc;
+}
+function vGoals(){
+  const gs=state.goals.filter(g=>ui.gcat==="all"||g.cat===ui.gcat);
+  const today=dayStart(new Date());
+  const body=gs.length?gs.map(g=>{const t=g.milestones.length,dn=g.milestones.filter(m=>m.done).length,pct=t?Math.round(100*dn/t):0;
+    let due="";if(g.deadline){const dl=Math.round((parse(g.deadline)-today)/864e5);due=` · Due ${shortDate(parse(g.deadline))} · <span class="mono">${dl>=0?dl+" days left":Math.abs(dl)+" days overdue"}</span>`}
+    return `<div class="goal"><div class="goal-head"><div class="body"><div class="t" style="font-weight:700">${esc(g.title)}</div>
+      <div class="tags" style="font-size:12px;color:var(--muted);margin-top:2px"><span class="cat">${CATS[g.cat]||"Other"}</span>${due}</div></div>
+      <button class="more" data-act="editGoal" data-id="${g.id}" aria-label="Edit goal">${ic.dots}</button></div>
+      <div class="bar"><i style="width:${pct}%"></i></div><div class="hint mono" style="margin-top:4px">${pct}% · ${dn}/${t} milestones</div>
+      ${t?`<ul class="ms">${g.milestones.map(m=>`<li class="${m.done?"done":""}"><button class="check" role="checkbox" aria-checked="${m.done}" data-act="ms" data-g="${g.id}" data-id="${m.id}" aria-label="${esc(m.t)}">${ic.check}</button><span>${esc(m.t)}</span></li>`).join("")}</ul>`:""}
+    </div>`}).join(""):`<div class="empty">Big goals with a deadline go here, like "Land a data internship". Split each into milestones.</div>`;
+  return catChips("gcat")+`<div class="card">${body}<button class="add" data-act="newGoal">+ Add long-term goal</button></div>`;
+}
+
+function vLists(){
+  const body=state.lists.map(l=>{const dn=l.items.filter(i=>i.done).length;
+    return `<div class="card"><div class="card-head"><h2>${esc(l.name)}</h2><span class="hint mono">${dn}/${l.items.length}</span></div>
+    ${l.items.length?`<ul class="items">${l.items.map(i=>`<li class="item${i.done?" done":""}"><button class="check" role="checkbox" aria-checked="${i.done}" data-act="lt" data-l="${l.id}" data-id="${i.id}" aria-label="${esc(i.t)}">${ic.check}</button><div class="body"><div class="t">${esc(i.t)}</div></div><button class="more" data-act="ldel" data-l="${l.id}" data-id="${i.id}" aria-label="Remove item">×</button></li>`).join("")}</ul>`:`<div class="empty">Empty list. Add the first item.</div>`}
+    <form class="li-add" data-l="${l.id}"><input id="li-${l.id}" placeholder="Add item" aria-label="New item for ${esc(l.name)}"><button class="btn" type="submit">Add</button></form>
+    <div class="row-actions"><button class="btn ghost" data-act="lreset" data-l="${l.id}">Uncheck all</button><button class="btn ghost" data-act="editList" data-l="${l.id}">Rename or delete</button></div></div>`}).join("");
+  return (body||`<div class="card"><div class="empty">Make checklists for anything: internship applications, packing, a project launch.</div></div>`)
+    +`<button class="add" style="background:var(--surface)" data-act="newList">+ New checklist</button>`;
+}
+
+function vStats(){
+  const now=new Date(),todayPct=periodPct("D");
+  // last 30 days
+  const days=[];for(let i=29;i>=0;i--){const d=dayStart(now);d.setDate(d.getDate()-i);days.push({d,v:dayPct(d)})}
+  const valid=days.filter(x=>x.v!==null);
+  const wk=[];for(let i=11;i>=0;i--){const m=mondayOf(now);m.setDate(m.getDate()-7*i);let s=0,c=0;
+    for(let j=0;j<7;j++){const d=new Date(m);d.setDate(d.getDate()+j);const v=dayPct(d);if(v!==null){s+=v;c++}}wk.push({m,v:c?Math.round(s/c):null})}
+  const thisWeek=wk[11].v;
+  const best=state.items.map(i=>({i,s:streak(i)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,5);
+  const kpis=`<div class="kpis"><div class="kpi"><b>${todayPct??"–"}${todayPct!=null?"%":""}</b><span>Today</span></div>
+    <div class="kpi"><b>${thisWeek??"–"}${thisWeek!=null?"%":""}</b><span>Week average</span></div>
+    <div class="kpi"><b>${best[0]?best[0].s:0}</b><span>Best streak</span></div></div>`;
+  // line chart
+  const W=340,H=150,L=30,R=10,T=10,B=24,iw=W-L-R,ih=H-T-B;
+  const x=i=>L+iw*i/29,y=v=>T+ih*(1-v/100);
+  let pts=days.map((o,i)=>o.v===null?null:[x(i),y(o.v)]);
+  const seg=pts.filter(Boolean);
+  let line="",area="";if(seg.length){line="M"+seg.map(p=>p.join(",")).join("L");
+    area=line+`L${seg[seg.length-1][0]},${y(0)}L${seg[0][0]},${y(0)}Z`}
+  const last=seg[seg.length-1];
+  const grid=[0,50,100].map(v=>`<line class="grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text class="lbl" x="${L-6}" y="${y(v)+3}" text-anchor="end">${v}%</text>`).join("");
+  const xl=[0,14,29].map(i=>`<text class="lbl" x="${x(i)}" y="${H-6}" text-anchor="${i===0?"start":i===29?"end":"middle"}">${shortDate(days[i].d)}</text>`).join("");
+  const lineSvg=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily completion, last 30 days">${grid}${xl}
+    ${seg.length>1?`<path class="area" d="${area}"/><path class="line" d="${line}"/>`:""}${last?`<circle class="dot" cx="${last[0]}" cy="${last[1]}" r="4"/>`:""}</svg>`;
+  // bars
+  const bw=iw/12;const bars=wk.map((o,i)=>{const v=o.v??0;const h=ih*v/100;
+    return `<rect class="barr${i===11?" cur":""}" x="${L+i*bw+bw*.18}" y="${T+ih-h}" width="${bw*.64}" height="${Math.max(h,o.v===null?0:1.5)}" rx="3"/>`}).join("");
+  const bl=[0,6,11].map(i=>`<text class="lbl" x="${L+i*bw+bw/2}" y="${H-6}" text-anchor="middle">${i===11?"This wk":shortDate(wk[i].m)}</text>`).join("");
+  const barSvg=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Average daily completion per week, last 12 weeks">${grid}${bars}${bl}</svg>`;
+  const prows=["W","M","Q","Y"].map(p=>{const v=periodPct(p);return `<div class="prow" style="${pvars(p)}"><span>${PU[p]}</span><div class="bar"><i style="width:${v??0}%"></i></div><span class="mono">${v==null?"–":v+"%"}</span></div>`}).join("");
+  const streaks=best.length?`<ul class="items">${best.map(o=>`<li class="item"><div class="body"><div class="t">${esc(o.i.title)}</div><div class="tags"><span class="cat">${P[o.i.period]}</span></div></div><span class="streak" style="font-size:14px">${ic.flame}${o.s}${SU[o.i.period]}</span></li>`).join("")}</ul>`:`<div class="empty">Complete a goal two periods in a row to start a streak.</div>`;
+  const note=valid.length<3?`<div class="hint" style="margin-top:6px">Graphs fill in as you check off goals each day.</div>`:"";
+  return kpis+`<div class="card"><div class="card-head"><h2>Daily completion</h2><span class="hint">Last 30 days</span></div>${lineSvg}${note}</div>
+    <div class="card"><div class="card-head"><h2>Weekly average</h2><span class="hint">Last 12 weeks</span></div>${barSvg}</div>
+    <div class="card"><div class="card-head"><h2>Current periods</h2></div>${prows}</div>
+    <div class="card"><div class="card-head"><h2>Top streaks</h2></div>${streaks}</div>`+vReflections();
+}
+function vReflections(){
+  const now=new Date(),mk=ymd(now).slice(0,7);
+  const ks=Object.keys(state.notes).filter(k=>state.notes[k]&&state.notes[k].trim()).sort().reverse();
+  const month=ks.filter(k=>k.startsWith(mk)).length;
+  const body=ks.length?ks.slice(0,5).map(k=>{const d=parse(k),p=dayPct(d);
+    return `<div class="refl"><div class="d"><span>${d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})}</span>${p!=null?`<span class="mono">${p}% of daily goals</span>`:""}</div><div class="txt">${esc(state.notes[k])}</div></div>`}).join("")
+    :`<div class="empty">No reflections yet. Write one on the Daily tab of the Tracker.</div>`;
+  return `<div class="card"><div class="card-head"><h2>Reflections</h2><span class="hint mono">${month} this month · ${now.getDate()} days</span></div>${body}
+    <div class="tools">${ks.length>5?`<button class="chip" data-act="pastNotes">All reflections (${ks.length})</button>`:""}${state.notes[ymd(now)]?"":`<button class="chip" data-act="writeNote">Write today's reflection</button>`}</div></div>`;
+}
+
+// ---------- sheets ----------
+const sheetRoot=document.getElementById("sheetRoot");
+function openSheet(s){ui.sheet=s;ui.armed=false;renderSheet()}
+function closeSheet(){ui.sheet=null;sheetRoot.innerHTML=""}
+function segBtns(name,opts,cur){return `<div class="seg" data-seg="${name}">${Object.entries(opts).map(([k,l])=>`<button type="button" data-v="${k}" aria-pressed="${cur===k}">${l}</button>`).join("")}</div>`}
+function renderSheet(){
+  const s=ui.sheet;if(!s){sheetRoot.innerHTML="";return}
+  let h="";
+  if(s.type==="item"){const it=s.id?state.items.find(i=>i.id===s.id):null;s.p=s.p||(it?it.period:ui.period);s.c=s.c||(it?it.cat:"career");
+    h=`<h3>${it?"Edit goal":"New goal"}</h3><div class="field"><label for="f-title">Goal</label><input id="f-title" maxlength="120" value="${esc(it?it.title:"")}" placeholder="e.g. Practice SQL for 30 min"></div>
+    <div class="field"><span class="lab">Repeats</span>${segBtns("p",P,s.p)}<span class="hint">Checks reset at midnight, Monday, the 1st of the month, quarter or year.</span></div>
+    <div class="field"><span class="lab">Category</span>${segBtns("c",CATS,s.c)}</div>
+    <div class="sheet-actions">${it?`<button class="btn danger${ui.armed?" armed":""}" data-act="del">${ui.armed?"Tap again to delete":"Delete"}</button>`:""}<div class="r"><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveItem">Save</button></div></div>`}
+  if(s.type==="goal"){const g=s.id?state.goals.find(x=>x.id===s.id):null;s.c=s.c||(g?g.cat:"career");
+    h=`<h3>${g?"Edit long-term goal":"New long-term goal"}</h3><div class="field"><label for="f-title">Goal</label><input id="f-title" maxlength="140" value="${esc(g?g.title:"")}" placeholder="e.g. Land a data engineering internship"></div>
+    <div class="field"><label for="f-dl">Deadline</label><input id="f-dl" type="date" value="${g&&g.deadline||""}"></div>
+    <div class="field"><span class="lab">Category</span>${segBtns("c",CATS,s.c)}</div>
+    <div class="field"><label for="f-ms">Milestones (one per line)</label><textarea id="f-ms" rows="5" placeholder="Update CV&#10;Build a portfolio project&#10;Apply to 20 companies">${esc(g?g.milestones.map(m=>m.t).join("\n"):"")}</textarea></div>
+    <div class="sheet-actions">${g?`<button class="btn danger${ui.armed?" armed":""}" data-act="del">${ui.armed?"Tap again to delete":"Delete"}</button>`:""}<div class="r"><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveGoal">Save</button></div></div>`}
+  if(s.type==="list"){const l=s.id?state.lists.find(x=>x.id===s.id):null;
+    h=`<h3>${l?"Checklist":"New checklist"}</h3><div class="field"><label for="f-title">Name</label><input id="f-title" maxlength="80" value="${esc(l?l.name:"")}" placeholder="e.g. Internship applications"></div>
+    <div class="sheet-actions">${l?`<button class="btn danger${ui.armed?" armed":""}" data-act="del">${ui.armed?"Tap again to delete":"Delete list"}</button>`:""}<div class="r"><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveList">Save</button></div></div>`}
+  if(s.type==="bg"){const u=(state.bg&&state.bg.url)||localBg;
+    h=`<h3>Background photo</h3><div class="bgprev" style="${u?`background-image:url('${u}')`:""}"></div>
+    <span class="hint">Pick any photo from your phone. Cards stay readable on top of it.</span>
+    <div class="sheet-actions">${u?`<button class="btn ghost" data-act="bgRemove">Remove photo</button>`:""}<div class="r"><button class="btn ghost" data-act="close">Close</button><button class="btn" data-act="bgPick">${u?"Change photo":"Choose photo"}</button></div></div>`}
+  if(s.type==="notes"){const ks=Object.keys(state.notes).filter(k=>state.notes[k]&&state.notes[k].trim()).sort().reverse();
+    h=`<h3>Past reflections</h3>${ks.length?ks.map(k=>`<div><div class="hint mono">${parse(k).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"})}</div><div style="white-space:pre-wrap">${esc(state.notes[k])}</div></div>`).join(""):`<div class="empty">No notes yet.</div>`}
+    <div class="sheet-actions"><div class="r"><button class="btn" data-act="close">Close</button></div></div>`}
+  if(s.type==="backup"){const lb=state.lastBackup?new Date(state.lastBackup).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):"never";
+    h=`<h3>Backup</h3><span class="hint">Your goals, notes and words are saved on this phone. Download a backup file now and then, and before changing phones or clearing browser data.</span>
+    <div class="hint mono">Last backup: ${lb}</div>
+    <div class="sheet-actions"><button class="btn" data-act="exportData">Download backup</button><button class="btn ghost" data-act="importPick">Restore from file</button></div>
+    ${s.pending?`<div class="banner">Restore the backup from ${esc(s.pending.date||"an unknown date")}? It replaces everything currently in the app.</div>
+    <div class="sheet-actions"><button class="btn ghost" data-act="importCancel">Cancel</button><button class="btn danger armed" data-act="importConfirm">Replace my data</button></div>`:""}
+    <div class="sheet-actions"><div class="r"><button class="btn ghost" data-act="close">Close</button></div></div>`}
+  if(s.type==="addWord"){
+    h=`<h3>Add a word</h3>
+    <div class="field"><label for="w-fr">French</label><input id="w-fr" maxlength="80" placeholder="e.g. un arrêt au stand"></div>
+    <div class="field"><label for="w-it">Italian</label><input id="w-it" maxlength="80" placeholder="e.g. una sosta ai box"></div>
+    <div class="field"><label for="w-en">English</label><input id="w-en" maxlength="80" placeholder="e.g. a pit stop"></div>
+    <div class="field"><label for="w-type">Type</label><input id="w-type" maxlength="20" placeholder="n.m., v., adj."></div>
+    <div class="field"><label for="w-ex">Example sentence</label><textarea id="w-ex" rows="2" maxlength="240"></textarea></div>
+    <div class="field"><label for="w-topic">Topic</label><input id="w-topic" maxlength="30" placeholder="e.g. F1"></div>
+    <div class="sheet-actions"><div class="r"><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveWordNew">Add word</button></div></div>`}
+  if(s.type==="addQ"){
+    h=`<h3>Add a question</h3>
+    <div class="field"><label for="q-h">Title</label><input id="q-h" maxlength="100" placeholder="e.g. Tyre delta"></div>
+    <div class="field"><label for="q-t">Topic</label><input id="q-t" maxlength="30" placeholder="e.g. F1 Strategy"></div>
+    <div class="field"><label for="q-b">Explanation</label><textarea id="q-b" rows="3" maxlength="1500"></textarea></div>
+    <div class="field"><label for="q-c">Code or example (optional)</label><textarea id="q-c" rows="3" maxlength="2000" style="font-family:var(--f-mono);font-size:13px"></textarea></div>
+    <div class="field"><label for="q-q">Question</label><input id="q-q" maxlength="300"></div>
+    <div class="field"><label for="q-a">Answer</label><input id="q-a" maxlength="300"></div>
+    <div class="sheet-actions"><div class="r"><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveQNew">Add question</button></div></div>`}
+  if(s.type==="manage"){const C=state.custom,N=state.notion;
+    const row=(t,sub,act,id)=>`<li class="item"><div class="body"><div class="t">${esc(t)}</div><div class="tags">${sub}</div></div>${act?`<button class="more" data-act="${act}" data-id="${esc(id)}" aria-label="Delete">×</button>`:""}</li>`;
+    const mine=[...C.words.map(w=>row(w.fr,`<span class="cat">Word</span><span>${esc(w.it||w.en||"")}</span>`,"delWord",w.id)),...C.lessons.map(l=>row(l.h,`<span class="cat">Question</span><span>${esc(l.t||"")}</span>`,"delQ",l.id))];
+    const nt=[...N.words.map(w=>row(w.fr,`<span class="cat">Word</span>`)),...N.lessons.map(l=>row(l.h,`<span class="cat">Question</span>`))];
+    h=`<h3>Your content</h3><div class="eyebrow">Added in the app</div>${mine.length?`<ul class="items">${mine.join("")}</ul>`:`<div class="empty">Nothing added yet.</div>`}
+    <div class="eyebrow">From Notion</div>${nt.length?`<ul class="items">${nt.join("")}</ul>`:`<div class="empty">No Notion items synced yet.</div>`}
+    <div class="hint">Edit or delete Notion items in Notion. The app picks up changes after the nightly sync, or right away if you run it on GitHub.</div>
+    <div class="sheet-actions"><a class="btn ghost" href="${NOTION_PAGE}" target="_blank" rel="noopener" style="text-decoration:none">Open Notion</a><div class="r"><button class="btn" data-act="close">Close</button></div></div>`}
+  if(s.type==="words"){const all=wordSeq();const ws=state.learned.words.map(k=>all.find(w=>w[0]===k)).filter(Boolean);
+    h=`<h3>My saved words</h3>${ws.length?`<ul class="items">${ws.map(w=>`<li class="item"><div class="body"><div class="t">${esc(w[0])} <span class="wtype">${esc(w[1])}</span></div><div class="tags"><span>IT: <b>${esc(w[3])}</b></span><span>EN: ${esc(w[2])}</span></div></div><button class="more" data-act="unsaveWord" data-k="${esc(w[0])}" aria-label="Remove">×</button></li>`).join("")}</ul>`:`<div class="empty">No saved words yet.</div>`}
+    <div class="sheet-actions"><div class="r"><button class="btn" data-act="close">Close</button></div></div>`}
+  const keep=document.activeElement&&sheetRoot.contains(document.activeElement)?document.activeElement.id:null;
+  sheetRoot.innerHTML=`<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true">${h}</div></div>`;
+  if(keep){const e=document.getElementById(keep);if(e)e.focus()}
+}
+
+// ---------- actions ----------
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");
+  const segb=e.target.closest(".seg button");
+  if(segb){const name=segb.parentElement.dataset.seg;keepFields();ui.sheet[name]=segb.dataset.v;renderSheet();return}
+  if(!b)return;const a=b.dataset.act,id=b.dataset.id;
+  if(a==="overlay"&&e.target!==b)return;
+  if(!state&&a!=="nav")return;
+  switch(a){
+    case "nav":ui.tab=b.dataset.k;render();scrollTo(0,0);break;
+    case "period":ui.period=b.dataset.k;render();break;
+    case "cat":ui[b.dataset.key]=b.dataset.k;render();break;
+    case "toggle":{const it=state.items.find(i=>i.id===id);const k=keyFor(it.period,new Date());const r=state.history[k]||{done:[],total:0};
+      r.done=r.done.includes(id)?r.done.filter(x=>x!==id):[...r.done,id];r.total=itemsOf(it.period).length;state.history[k]=r;commit();break}
+    case "newItem":openSheet({type:"item"});focusTitle();break;
+    case "editItem":openSheet({type:"item",id});break;
+    case "newGoal":openSheet({type:"goal"});focusTitle();break;
+    case "editGoal":openSheet({type:"goal",id});break;
+    case "newList":openSheet({type:"list"});focusTitle();break;
+    case "editList":openSheet({type:"list",id:b.dataset.l});break;
+    case "pastNotes":openSheet({type:"notes"});break;
+    case "bg":openSheet({type:"bg"});break;
+    case "bgPick":document.getElementById("bgFile").click();break;
+    case "bgRemove":removeBg();break;
+    case "overlay":case "close":closeSheet();break;
+    case "saveItem":{const t=val("f-title");if(!t){toast("Give the goal a name.");return}const s=ui.sheet;
+      if(s.id){const it=state.items.find(i=>i.id===s.id);const oldP=it.period;Object.assign(it,{title:t,period:s.p,cat:s.c});refreshTotals(oldP)}
+      else state.items.push({id:uid(),title:t,period:s.p,cat:s.c,created:ymd(new Date())});
+      refreshTotals(s.p);ui.period=s.p;closeSheet();commit();toast("Saved");break}
+    case "saveGoal":{const t=val("f-title");if(!t){toast("Give the goal a name.");return}const s=ui.sheet;
+      const lines=(document.getElementById("f-ms").value||"").split("\n").map(x=>x.trim()).filter(Boolean);
+      const old=s.id?state.goals.find(g=>g.id===s.id):null;
+      const ms=lines.map(l=>{const m=old&&old.milestones.find(x=>x.t===l);return m?{...m}:{id:uid(),t:l,done:false}});
+      const g={id:s.id||uid(),title:t,deadline:val("f-dl")||"",cat:s.c,milestones:ms,created:old?old.created:ymd(new Date())};
+      if(old)state.goals[state.goals.indexOf(old)]=g;else state.goals.push(g);closeSheet();commit();toast("Saved");break}
+    case "saveList":{const t=val("f-title");if(!t){toast("Name the checklist.");return}const s=ui.sheet;
+      if(s.id)state.lists.find(l=>l.id===s.id).name=t;else state.lists.push({id:uid(),name:t,items:[]});closeSheet();commit();break}
+    case "del":{if(!ui.armed){keepFields();ui.armed=true;renderSheet();return}const s=ui.sheet;
+      if(s.type==="item"){const it=state.items.find(i=>i.id===s.id);state.items=state.items.filter(i=>i.id!==s.id);refreshTotals(it.period)}
+      if(s.type==="goal")state.goals=state.goals.filter(g=>g.id!==s.id);
+      if(s.type==="list")state.lists=state.lists.filter(l=>l.id!==s.id);
+      closeSheet();commit();toast("Deleted");break}
+    case "ms":{const g=state.goals.find(x=>x.id===b.dataset.g);const m=g.milestones.find(x=>x.id===id);m.done=!m.done;commit();break}
+    case "lt":{const l=state.lists.find(x=>x.id===b.dataset.l);const i=l.items.find(x=>x.id===id);i.done=!i.done;commit();break}
+    case "ldel":{const l=state.lists.find(x=>x.id===b.dataset.l);l.items=l.items.filter(x=>x.id!==id);commit();break}
+    case "lreset":{const l=state.lists.find(x=>x.id===b.dataset.l);l.items.forEach(i=>i.done=false);commit();break}
+    case "shift":{const k=b.dataset.k;ui.off[k]=Math.max(-365,Math.min(30,ui.off[k]+Number(b.dataset.d)));if(k==="l")ui.reveal=false;render();break}
+    case "reveal":ui.reveal=true;render();break;
+    case "say":if(canSpeak)say(b.dataset.txt,b.dataset.lang);break;
+    case "saveWord":case "unsaveWord":{const k=b.dataset.k,W=state.learned.words;
+      state.learned.words=W.includes(k)?W.filter(x=>x!==k):[...W,k];commit(false);render();break}
+    case "savedWords":openSheet({type:"words"});break;
+    case "backup":openSheet({type:"backup"});break;
+    case "exportData":{try{const blob=new Blob([JSON.stringify({app:"saso-goal-tracker",v:1,exported:new Date().toISOString(),state,bg:localBg||null})],{type:"application/json"});
+      const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=`saso-goal-tracker-${ymd(new Date())}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);
+      state.lastBackup=Date.now();commit(false);renderSheet();toast("Backup downloaded")}catch(e){toast("Couldn't create the backup file.")}break}
+    case "importPick":document.getElementById("importFile").click();break;
+    case "importCancel":ui.sheet.pending=null;renderSheet();break;
+    case "importConfirm":{const p=ui.sheet.pending;if(!p)return;state=norm(p.data.state);localBg=p.data.bg||null;
+      try{if(localBg)localStorage.setItem(LS+"-bg",localBg);else localStorage.removeItem(LS+"-bg")}catch(e){}
+      closeSheet();commit();toast("Backup restored");break}
+    case "addWord":openSheet({type:"addWord"});setTimeout(()=>{const e=document.getElementById("w-fr");if(e)e.focus()},30);break;
+    case "addQ":openSheet({type:"addQ"});setTimeout(()=>{const e=document.getElementById("q-h");if(e)e.focus()},30);break;
+    case "manage":openSheet({type:"manage"});break;
+    case "sync":ui._retried=false;syncNotion(false);break;
+    case "saveWordNew":{const fr=val("w-fr");if(!fr){toast("Add the French word.");return}
+      state.custom.words.push({id:uid(),fr,it:val("w-it"),en:val("w-en"),type:val("w-type"),ex:val("w-ex"),topic:val("w-topic"),day:dayNum(),ts:Date.now()});
+      closeSheet();commit();toast("Word added. It shows up from tomorrow.");break}
+    case "saveQNew":{const hh=val("q-h");if(!hh){toast("Give the question a title.");return}
+      state.custom.lessons.push({id:uid(),h:hh,t:val("q-t")||"My notes",b:val("q-b"),c:(document.getElementById("q-c").value||"").replace(/\s+$/,""),q:val("q-q"),a:val("q-a"),day:dayNum(),ts:Date.now()});
+      closeSheet();commit();toast("Question added. It shows up from tomorrow.");break}
+    case "delWord":state.custom.words=state.custom.words.filter(w=>w.id!==id);commit(false);renderSheet();render();break;
+    case "delQ":state.custom.lessons=state.custom.lessons.filter(l=>l.id!==id);commit(false);renderSheet();render();break;
+    case "learned":{const k=b.dataset.k,Ls=state.learned.lessons;state.learned.lessons=Ls.includes(k)?Ls.filter(x=>x!==k):[...Ls,k];commit();break}
+    case "writeNote":ui.tab="tracker";ui.period="D";render();setTimeout(()=>{const n=document.getElementById("note");if(n){n.focus();n.scrollIntoView({block:"center"})}},30);break;
+  }
+});
+document.addEventListener("submit",e=>{const f=e.target.closest(".li-add");if(!f)return;e.preventDefault();
+  const inp=f.querySelector("input");const t=inp.value.trim();if(!t)return;
+  state.lists.find(l=>l.id===f.dataset.l).items.push({id:uid(),t,done:false});commit();
+  const n=document.getElementById(inp.id);if(n)n.focus()});
+document.addEventListener("input",e=>{if(e.target.id!=="note")return;
+  state.notes[ymd(new Date())]=e.target.value;state.updated=Date.now();lsSave();
+  clearTimeout(noteT);noteT=setTimeout(()=>{clearTimeout(saveT);saveT=setTimeout(()=>{saveT=null;dbSave()},50)},900)});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&ui.sheet)closeSheet()});
+const val=id=>{const e=document.getElementById(id);return e?e.value.trim():""};
+function keepFields(){const s=ui.sheet;if(!s)return;sheetRoot.querySelectorAll("input[id],textarea[id]").forEach(e=>{s["_"+e.id]=e.value})}
+const _rs=renderSheet;renderSheet=function(){const s=ui.sheet;_rs();if(!s)return;sheetRoot.querySelectorAll("input[id],textarea[id]").forEach(e=>{if(s["_"+e.id]!==undefined)e.value=s["_"+e.id]})};
+function focusTitle(){setTimeout(()=>{const e=document.getElementById("f-title");if(e)e.focus()},30)}
+let toastT;function toast(m){const t=document.getElementById("toast");t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2200)}
+
+document.getElementById("importFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+  const fr=new FileReader();fr.onload=()=>{try{const d=JSON.parse(fr.result);
+    if(d&&d.app==="saso-goal-tracker"&&d.state&&Array.isArray(d.state.items)){if(!ui.sheet||ui.sheet.type!=="backup")openSheet({type:"backup"});ui.sheet.pending={data:d,date:(d.exported||"").slice(0,10)};renderSheet()}
+    else toast("That file isn't a Goal Tracker backup.")}catch(err){toast("That file isn't a Goal Tracker backup.")}};fr.readAsText(f)});
+// ---------- background photo ----------
+document.getElementById("bgFile").addEventListener("change",async e=>{
+  const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+  try{
+    const blob=await shrink(f);
+    if(assets){const r=await assets.upload(blob);
+      const old=state.bg&&state.bg.id;state.bg={id:r.id,url:r.url};commit();
+      if(old)assets.delete(old).catch(()=>{});
+    }else{const url=await toDataURL(blob);localBg=url;try{localStorage.setItem(LS+"-bg",url)}catch(_){toast("Photo too large to keep on this device.")}render()}
+    closeSheet();toast("Background updated");
+  }catch(err){toast("Couldn't use that photo. Try a JPG or PNG.")}
+});
+function removeBg(){const old=state.bg&&state.bg.id;state.bg=null;localBg=null;try{localStorage.removeItem(LS+"-bg")}catch(e){}
+  if(old&&assets)assets.delete(old).catch(()=>{});closeSheet();commit()}
+function shrink(file){return new Promise((res,rej)=>{const img=new Image();const u=URL.createObjectURL(file);
+  img.onload=()=>{const s=Math.min(1,1600/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>b?res(b):rej(),"image/jpeg",.82)};
+  img.onerror=()=>{URL.revokeObjectURL(u);rej()};img.src=u})}
+function toDataURL(b){return new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b)})}
+
+// ---------- midnight reset tick ----------
+let lastKey=keyFor("D",new Date());
+setInterval(()=>{const k=keyFor("D",new Date());
+  if(k!==lastKey){lastKey=k;if(state){["D","W","M","Q","Y"].forEach(p=>{if(!state.history[keyFor(p,new Date())]&&itemsOf(p).length)state.history[keyFor(p,new Date())]={done:[],total:itemsOf(p).length}});commit()}}
+  else if(state&&!ui.sheet&&document.activeElement?.id!=="note"&&!document.activeElement?.closest?.(".li-add"))render();
+},30000);
+
+// ---------- boot ----------
+state=norm(lsLoad());
+render();
+if(!state){state=null}
+(async()=>{
+  let db=null,user=null;
+  try{[db,user,assets]=await Promise.all([window.claude?.use?.("db"),window.claude?.use?.("user"),window.claude?.use?.("assets")])}catch(e){}
+  let id=null;try{id=user?await user.id():null}catch(e){}
+  if(db&&id){
+    try{ref=db.doc("data/users/"+id+"/tracker")}catch(e){ref=null}
+  }
+  if(!ref){sync="local";if(!state)state=blank();render();if(STANDALONE)setTimeout(()=>syncNotion(true),600);return}
+  sync="cloud";
+  setTimeout(async()=>{try{const perm=await window.claude?.use?.("permissions");const st=perm?await perm.state("mcp:Notion").catch(()=>"unavailable"):"unavailable";if(st==="granted"&&state)syncNotion(true)}catch(e){}},2500);
+  let first=true;
+  ref.onSnapshot(snap=>{
+    if(saveT)return;
+    if(snap.exists){const remote=snap.data();
+      if(!state||(remote.updated||0)>=(state.updated||0)){state=norm(JSON.parse(JSON.stringify(remote)));lsSave();
+        if(document.activeElement?.id==="note"&&!first)return;render()}
+    }else if(first){if(state)dbSave();else{state=blank();render()}}
+    first=false;
+  },()=>{sync="local";if(!state)state=blank();render()});
+  setTimeout(()=>{if(!state){state=blank();render()}},10000);
+})();
+})();
+</script>
+<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}</script>
+</body>
+</html>

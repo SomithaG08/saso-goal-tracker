@@ -1,0 +1,36 @@
+name: Sync Notion and deploy app
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 4 * * *"   # every night, 05:00 Paris time in winter
+  workflow_dispatch:       # "Run workflow" button for an instant sync
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull Vocabulary and Questions from Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: python3 scripts/sync_notion.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
